@@ -1,0 +1,24 @@
+.App {
+    min-height: 100vh;
+    min-width: 100vh;
+
+    background-color: #222;
+    color: #FFF;
+
+    padding: 25px;
+}
+
+.ui.modal>.header {
+    background-color: #222;
+    color: #FFF;
+}
+
+.ui.modal>.content {
+    background-color: #222;
+    color: #FFF;
+}
+
+.ui.modal>.actions {
+    background-color: #222;
+    color: #FFF;
+}
