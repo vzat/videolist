@@ -1,7 +1,7 @@
 {
   "name": "videolist",
   "version": "0.1.0",
-  "homepage": "http://vzat.github.io/videolist",
+  "homepage": "https://vzat.github.io/videolist",
   "private": true,
   "dependencies": {
     "react": "^16.4.0",
