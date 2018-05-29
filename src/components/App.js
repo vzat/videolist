@@ -156,6 +156,8 @@ class App extends Component {
 
         return (
             <div className = 'App'>
+                Subscriptions: { subs.length }
+                <br/>
                 <ul> { subList } </ul>
             </div>
         );
