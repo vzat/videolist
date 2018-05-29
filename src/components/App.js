@@ -10,7 +10,8 @@ class App extends Component {
     state = {
         clientId: undefined,
         clientSecret: undefined,
-        credentialsModal: false
+        credentialsModal: false,
+        subs: []
     }
 
     loadApi = async (script) => {
@@ -43,6 +44,44 @@ class App extends Component {
         }
     }
 
+    fetchSubs = async () => {
+        try {
+            let subs = [];
+
+            let subListPart = await window.gapi.client.youtube.subscriptions.list({
+                mine: 'true',
+                part: 'snippet'
+            });
+
+            if (subListPart.status !== 200) {
+                throw new Error("Cannot fetch subscriptions");
+            }
+
+            let startTime = new Date().getTime() / 1000;
+            let waitTime = 60;
+
+            while (startTime + waitTime > new Date().getTime() / 1000) {
+                const totalItems = subListPart.result.items.length;
+
+                for (let i = 0 ; i < totalItems ; i++) {
+                    subs.push(subListPart.result.items[i].snippet);
+                }
+                if (!subListPart.result.nextPageToken)  break;
+
+                subListPart = await window.gapi.client.youtube.subscriptions.list({
+                    mine: 'true',
+                    part: 'snippet',
+                    pageToken: subListPart.result.nextPageToken
+                });
+            }
+
+            this.setState({subs: subs});
+        }
+        catch (err) {
+            throw new Error(err);
+        }
+    }
+
     componentDidMount = async () => {
         try {
             const script = document.createElement('script');
@@ -56,21 +95,22 @@ class App extends Component {
                 // Load the youtube component
                 await this.loadApi(script);
 
-                await this.authoriseApi();
+                if (!accessToken || !expiresAt || expiresAt <= new Date().getTime() / 1000 - 10) {
+                    await this.authoriseApi();
 
-                // if (!accessToken || !expiresAt || expiresAt <= new Date().getTime() / 1000) {
-                //     await this.authoriseApi();
-                //
-                //     // Get new token
-                //     accessToken = this.getFromLocalStorage('access_token');
-                // }
+                    // Get new token
+                    accessToken = this.getFromLocalStorage('access_token');
+                }
 
-                // window.gapi.client.setApiKey(accessToken);
+                // Set the access token for the requests
+                window.gapi.client.setToken({access_token: accessToken});
 
-                const subs = await window.gapi.client.youtube.subscriptions.list({
-                    mine: 'true',
-                    part: 'snippet'
-                });
+                this.fetchSubs();
+
+                // const subs = await window.gapi.client.youtube.subscriptions.list({
+                //     mine: 'true',
+                //     part: 'snippet'
+                // });
 
                 // TODO: Save the list of subs
                 // Use search for each channel id and retrieve their videos
@@ -80,7 +120,7 @@ class App extends Component {
                 // Do this until the page is filled? (50?)
                 // Load more when the user scrolls down
 
-                console.log(subs);
+                // console.log(subs);
             };
 
             document.body.appendChild(script);
@@ -109,9 +149,14 @@ class App extends Component {
     }
 
     render() {
+        const { subs } = this.state;
+        const subList = subs.map((index, value) => (
+            <li> {subs[value].title} </li>
+        ));
+
         return (
             <div className = 'App'>
-                Hello World!
+                <ul> { subList } </ul>
             </div>
         );
     }
