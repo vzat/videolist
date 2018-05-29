@@ -21,5 +21,6 @@
   },
   "devDependencies": {
     "gh-pages": "^1.1.0"
-  }
+  },
+  "proxy": "http://localhost:3000"
 }

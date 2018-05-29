@@ -14,36 +14,80 @@ class App extends Component {
     }
 
     loadApi = async (script) => {
-
-        if (script.getAttribute('gapi_processed')) {
-            try {
-                const response = await window.gapi.auth.authorize({
-                    client_id: OAUTH2_CLIENT_ID,
-                    scope: OAUTH2_SCOPES,
-                    immediate: false
-                });
-
-                console.log(response);
+        try {
+            while (!script.getAttribute('gapi_processed')) {
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
-            catch (err) {
-                throw new Error(JSON.stringify(err));
-            }
+            await window.gapi.client.load('youtube', 'v3');
         }
-        else {
-            setTimeout(() => {this.loadApi(script)}, 100);
+        catch (err) {
+            throw new Error(JSON.stringify(err));
         }
-
     }
 
-    componentDidMount = () => {
-        const script = document.createElement('script');
-        script.src = 'https://apis.google.com/js/client.js';
+    authoriseApi = async () => {
+        try {
+            const response = await window.gapi.auth.authorize({
+                client_id: OAUTH2_CLIENT_ID,
+                scope: OAUTH2_SCOPES,
+                immediate: false
+            });
 
-        script.onload = () => {
-            this.loadApi(script);
-        };
+            if (response && !response.error) {
+                this.saveToLocalStorage('access_token', response.access_token);
+                this.saveToLocalStorage('expires_at', response.expires_at);
+            }
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
 
-        document.body.appendChild(script);
+    componentDidMount = async () => {
+        try {
+            const script = document.createElement('script');
+            script.src = 'https://apis.google.com/js/client.js';
+
+            script.onload = async () => {
+                let accessToken = this.getFromLocalStorage('access_token');
+                let expiresAt = this.getFromLocalStorage('expires_at');
+
+                // Wait for script to load
+                // Load the youtube component
+                await this.loadApi(script);
+
+                await this.authoriseApi();
+
+                // if (!accessToken || !expiresAt || expiresAt <= new Date().getTime() / 1000) {
+                //     await this.authoriseApi();
+                //
+                //     // Get new token
+                //     accessToken = this.getFromLocalStorage('access_token');
+                // }
+
+                // window.gapi.client.setApiKey(accessToken);
+
+                const subs = await window.gapi.client.youtube.subscriptions.list({
+                    mine: 'true',
+                    part: 'snippet'
+                });
+
+                // TODO: Save the list of subs
+                // Use search for each channel id and retrieve their videos
+                // Order videos based on the publishedAt time
+                // Keep a list of unprocessed videos for each channel
+                // Get older videos if the unprocessed list is empty
+                // Do this until the page is filled? (50?)
+                // Load more when the user scrolls down
+
+                console.log(subs);
+            };
+
+            document.body.appendChild(script);
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
     }
 
     saveToLocalStorage = (key, value) => {
