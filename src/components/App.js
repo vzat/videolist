@@ -3,6 +3,9 @@ import './css/App.css';
 
 import Credentials from './Credentials'
 
+const OAUTH2_CLIENT_ID = '537371083703-tt6pkisgd198nrr04b3tb5mepdi22fep.apps.googleusercontent.com';
+const OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
+
 class App extends Component {
     state = {
         clientId: undefined,
@@ -10,18 +13,37 @@ class App extends Component {
         credentialsModal: false
     }
 
-    componentDidMount = () => {
-        const clientId = this.getFromLocalStorage('client_id');
-        const clientSecret = this.getFromLocalStorage('client_secret');
+    loadApi = async (script) => {
 
-        if (!clientId || !clientSecret) {
-            // Open API Modal
-            this.setState({credentialsModal: true});
+        if (script.getAttribute('gapi_processed')) {
+            try {
+                const response = await window.gapi.auth.authorize({
+                    client_id: OAUTH2_CLIENT_ID,
+                    scope: OAUTH2_SCOPES,
+                    immediate: false
+                });
+
+                console.log(response);
+            }
+            catch (err) {
+                throw new Error(JSON.stringify(err));
+            }
         }
         else {
-            this.setState({clientId: clientId});
-            this.setState({clientSecret: clientSecret});
+            setTimeout(() => {this.loadApi(script)}, 100);
         }
+
+    }
+
+    componentDidMount = () => {
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/client.js';
+
+        script.onload = () => {
+            this.loadApi(script);
+        };
+
+        document.body.appendChild(script);
     }
 
     saveToLocalStorage = (key, value) => {
@@ -46,15 +68,15 @@ class App extends Component {
         return (
             <div className = 'App'>
                 Hello World!
-
-                <Credentials
-                    open = {this.state.credentialsModal}
-                    closeModal = {this.closeModal}
-                    saveToLocalStorage = {this.saveToLocalStorage}
-                />
             </div>
         );
     }
 }
 
 export default App;
+
+// <Credentials
+//     open = {this.state.credentialsModal}
+//     closeModal = {this.closeModal}
+//     saveToLocalStorage = {this.saveToLocalStorage}
+// />

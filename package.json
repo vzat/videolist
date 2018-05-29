@@ -4,6 +4,7 @@
   "homepage": "https://vzat.github.io/videolist",
   "private": true,
   "dependencies": {
+    "googleapis": "^31.0.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-scripts": "1.1.4",
