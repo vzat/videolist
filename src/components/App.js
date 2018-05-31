@@ -11,7 +11,8 @@ class App extends Component {
         clientId: undefined,
         clientSecret: undefined,
         credentialsModal: false,
-        subs: []
+        subs: [],
+        uploadPlaylists: {}
     }
 
     loadApi = async (script) => {
@@ -47,6 +48,7 @@ class App extends Component {
     fetchSubs = async () => {
         try {
             let subs = [];
+            // let uploadPlaylists = {};
 
             let subListPart = await window.gapi.client.youtube.subscriptions.list({
                 mine: 'true',
@@ -61,13 +63,44 @@ class App extends Component {
             let waitTime = 60;
 
             while (startTime + waitTime > new Date().getTime() / 1000) {
+                let subList = [];
                 const totalItems = subListPart.result.items.length;
 
+                // List of subs on the page for getting some extra channel details (uploads playlist)
+                let pageSubs = '';
+
+                // Get subs names
                 for (let i = 0 ; i < totalItems ; i++) {
+                    // subList.push(subListPart.result.items[i].snippet);
                     subs.push(subListPart.result.items[i].snippet);
+                    pageSubs += subListPart.result.items[i].snippet.resourceId.channelId;
+
+                    if (i < totalItems - 1) {
+                        pageSubs += ',';
+                    }
                 }
+
+                // !!! The upload playlist id is the same as the channel id
+
+                // Get new page with channel related playlists
+                // let channelListPart = await window.gapi.client.youtube.channels.list({
+                //       id: pageSubs,
+                //       part: 'contentDetails'
+                // });
+
+                // Add the sub details to the subs list
+                // for (let channelIndex = 0 ; channelIndex < channelListPart.result.items.length ; channelIndex++) {
+                //
+                //     uploadPlaylists[channelListPart.result.items[channelIndex].id] = channelListPart.result.items[channelIndex].contentDetails.relatedPlaylists.uploads;
+                // }
+
+                // Reached end of subs
                 if (!subListPart.result.nextPageToken)  break;
 
+                // Save the subs
+                this.setState({subs: subs});
+
+                // Get new page with subscriptions
                 subListPart = await window.gapi.client.youtube.subscriptions.list({
                     mine: 'true',
                     part: 'snippet',
@@ -75,7 +108,9 @@ class App extends Component {
                 });
             }
 
-            this.setState({subs: subs});
+            console.log(subs);
+            this.setState({subs});
+            // this.setState({uploadPlaylists})
         }
         catch (err) {
             throw new Error(err);
@@ -107,11 +142,6 @@ class App extends Component {
 
                 this.fetchSubs();
 
-                // const subs = await window.gapi.client.youtube.subscriptions.list({
-                //     mine: 'true',
-                //     part: 'snippet'
-                // });
-
                 // TODO: Save the list of subs
                 // Use search for each channel id and retrieve their videos
                 // Order videos based on the publishedAt time
@@ -119,8 +149,6 @@ class App extends Component {
                 // Get older videos if the unprocessed list is empty
                 // Do this until the page is filled? (50?)
                 // Load more when the user scrolls down
-
-                // console.log(subs);
             };
 
             document.body.appendChild(script);
