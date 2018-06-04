@@ -10,16 +10,12 @@ class App extends Component {
         clientSecret: undefined,
         credentialsModal: false,
         subs: [],
-        stagingArea: [{
-            channelId: 'dadadcxz',
-            videos: [],
-            lastPublishedVideo: 'time in seconds',
-            nextPageToken: 'ADSDX'
-        }],
+        stagingArea: {},
         subBox: [{
             title: 'dsada',
             thumbnail: 'url'
-        }]
+        }],
+        subInfo: []
     }
 
     loadApi = async (script) => {
@@ -88,8 +84,6 @@ class App extends Component {
                     // }
                 }
 
-                console.log(subListPart);
-
                 // !!! The upload playlist id is the same as the channel id except is starts with UU instead of UC
 
                 // // Get new page with channel related playlists
@@ -121,8 +115,14 @@ class App extends Component {
                 });
             }
 
-            console.log(subs);
+            // Create hashed array with channel details
+            let subInfo = {};
+            for (let i = 0 ; i < subs.length ; i++) {
+                subInfo[subs[i].channelId] = subs[i];
+            }
+
             this.setState({subs});
+            this.setState({subInfo});
             // this.setState({uploadPlaylists})
         }
         catch (err) {
@@ -132,36 +132,76 @@ class App extends Component {
 
     fetchLatestVideos = async (channelId) => {
         try {
-            // array of subs
-            // each item contains an array of videos (max 5)
-            // it also contains the token to the next page
-            // if the next page is null remove sub from array
-
             const { stagingArea } = this.state;
 
             const playlistId = channelId[0] + 'U' + channelId.substring(2);
-            console.log(playlistId);
 
-            // let nextPageToken = null;
-            // if (stagingArea[channelId]) {
-            //     nextPageToken = stagingArea[channelId].nextPageToken;
-            // }
+            let nextPageToken = null;
+            if (stagingArea[channelId]) {
+                nextPageToken = stagingArea[channelId].nextPageToken;
 
+                // Delete sub if the last page was reached
+                if (!nextPageToken) {
+                    delete stagingArea[channelId];
+                    return;
+                }
+            }
+
+            // Get new videos
             const videoListPart = await window.gapi.client.youtube.playlistItems.list({
                 playlistId: playlistId,
-                part: 'snippet'
+                part: 'snippet',
+                nextPageToken: nextPageToken
             });
 
-            // Get items
-            // Sort by published date
-            // transform newest date to number and save it
-            // save next page token
+            // Extract videos
+            let videos = [];
+            for (let i = 0 ; i < videoListPart.result.items.length ; i++) {
+                videos.push(videoListPart.result.items[i].snippet);
+            }
 
-            console.log(videoListPart);
+            if (videos.length === 0) {
+                delete stagingArea[channelId];
+                return;
+            }
+
+            // Sort by published date
+            this.sortByDate(videos, 'publishedAt');
+
+            // Save videos
+            const sub = {
+                videos: videos.slice(),
+                lastPublishedVideo: videos[0].publishedAt,
+                nextPageToken: videoListPart.result.nextPageToken
+            }
+            stagingArea[channelId] = sub;
+
+            await this.setState({stagingArea});
         }
         catch (err) {
             throw new Error(err);
         }
+    }
+
+    initStagingArea = async () => {
+        try {
+            const { subs } = this.state;
+
+            for (let i = 0 ; i < subs.length ; i++) {
+                await this.fetchLatestVideos(subs[i].resourceId.channelId);
+            }
+
+            console.log(this.state.stagingArea);
+        }
+        catch (err) {
+            throw new Error(err);
+        }
+    }
+
+    sortByDate = (array, key) => {
+        array.sort((a, b) => {
+            return new Date(b[key]) - new Date(a[key]);
+        })
     }
 
     componentDidMount = async () => {
@@ -189,7 +229,8 @@ class App extends Component {
 
                 await this.fetchSubs();
 
-                this.fetchLatestVideos('UC7A_dLnSAjl7uROCdoNyjzg');
+                // this.fetchLatestVideos('UC7A_dLnSAjl7uROCdoNyjzg');
+                this.initStagingArea();
 
                 // TODO: Save the list of subs
                 // Use search for each channel id and retrieve their videos
