@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import './css/App.css';
 
-import Credentials from './Credentials'
-
 const OAUTH2_CLIENT_ID = '537371083703-tt6pkisgd198nrr04b3tb5mepdi22fep.apps.googleusercontent.com';
 const OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
 
@@ -12,7 +10,16 @@ class App extends Component {
         clientSecret: undefined,
         credentialsModal: false,
         subs: [],
-        uploadPlaylists: {}
+        stagingArea: [{
+            channelId: 'dadadcxz',
+            videos: [],
+            lastPublishedVideo: 'time in seconds',
+            nextPageToken: 'ADSDX'
+        }],
+        subBox: [{
+            title: 'dsada',
+            thumbnail: 'url'
+        }]
     }
 
     loadApi = async (script) => {
@@ -52,7 +59,8 @@ class App extends Component {
 
             let subListPart = await window.gapi.client.youtube.subscriptions.list({
                 mine: 'true',
-                part: 'snippet'
+                part: 'snippet',
+                maxResults: 50
             });
 
             if (subListPart.status !== 200) {
@@ -63,36 +71,40 @@ class App extends Component {
             let waitTime = 60;
 
             while (startTime + waitTime > new Date().getTime() / 1000) {
-                let subList = [];
+                // let subList = [];
                 const totalItems = subListPart.result.items.length;
 
                 // List of subs on the page for getting some extra channel details (uploads playlist)
-                let pageSubs = '';
+                // let pageSubs = '';
 
                 // Get subs names
                 for (let i = 0 ; i < totalItems ; i++) {
                     // subList.push(subListPart.result.items[i].snippet);
                     subs.push(subListPart.result.items[i].snippet);
-                    pageSubs += subListPart.result.items[i].snippet.resourceId.channelId;
-
-                    if (i < totalItems - 1) {
-                        pageSubs += ',';
-                    }
+                    // pageSubs += subListPart.result.items[i].snippet.resourceId.channelId;
+                    //
+                    // if (i < totalItems - 1) {
+                    //     pageSubs += ',';
+                    // }
                 }
 
-                // !!! The upload playlist id is the same as the channel id
+                console.log(subListPart);
 
-                // Get new page with channel related playlists
+                // !!! The upload playlist id is the same as the channel id except is starts with UU instead of UC
+
+                // // Get new page with channel related playlists
                 // let channelListPart = await window.gapi.client.youtube.channels.list({
                 //       id: pageSubs,
                 //       part: 'contentDetails'
                 // });
-
-                // Add the sub details to the subs list
+                //
+                // // Add the sub details to the subs list
                 // for (let channelIndex = 0 ; channelIndex < channelListPart.result.items.length ; channelIndex++) {
                 //
                 //     uploadPlaylists[channelListPart.result.items[channelIndex].id] = channelListPart.result.items[channelIndex].contentDetails.relatedPlaylists.uploads;
                 // }
+
+                // console.log(uploadPlaylists);
 
                 // Reached end of subs
                 if (!subListPart.result.nextPageToken)  break;
@@ -104,13 +116,48 @@ class App extends Component {
                 subListPart = await window.gapi.client.youtube.subscriptions.list({
                     mine: 'true',
                     part: 'snippet',
-                    pageToken: subListPart.result.nextPageToken
+                    pageToken: subListPart.result.nextPageToken,
+                    maxResults: 50
                 });
             }
 
             console.log(subs);
             this.setState({subs});
             // this.setState({uploadPlaylists})
+        }
+        catch (err) {
+            throw new Error(err);
+        }
+    }
+
+    fetchLatestVideos = async (channelId) => {
+        try {
+            // array of subs
+            // each item contains an array of videos (max 5)
+            // it also contains the token to the next page
+            // if the next page is null remove sub from array
+
+            const { stagingArea } = this.state;
+
+            const playlistId = channelId[0] + 'U' + channelId.substring(2);
+            console.log(playlistId);
+
+            // let nextPageToken = null;
+            // if (stagingArea[channelId]) {
+            //     nextPageToken = stagingArea[channelId].nextPageToken;
+            // }
+
+            const videoListPart = await window.gapi.client.youtube.playlistItems.list({
+                playlistId: playlistId,
+                part: 'snippet'
+            });
+
+            // Get items
+            // Sort by published date
+            // transform newest date to number and save it
+            // save next page token
+
+            console.log(videoListPart);
         }
         catch (err) {
             throw new Error(err);
@@ -140,7 +187,9 @@ class App extends Component {
                 // Set the access token for the requests
                 window.gapi.client.setToken({access_token: accessToken});
 
-                this.fetchSubs();
+                await this.fetchSubs();
+
+                this.fetchLatestVideos('UC7A_dLnSAjl7uROCdoNyjzg');
 
                 // TODO: Save the list of subs
                 // Use search for each channel id and retrieve their videos
