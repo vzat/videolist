@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './css/App.css';
 
+import SubBox from './SubBox';
+
 const OAUTH2_CLIENT_ID = '537371083703-tt6pkisgd198nrr04b3tb5mepdi22fep.apps.googleusercontent.com';
 const OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
 
@@ -11,11 +13,9 @@ class App extends Component {
         credentialsModal: false,
         subs: [],
         stagingArea: {},
-        subBox: [{
-            title: 'dsada',
-            thumbnail: 'url'
-        }],
-        subInfo: []
+        subBox: [],
+        subInfo: [],
+        page: 'subBox'
     }
 
     loadApi = async (script) => {
@@ -118,7 +118,7 @@ class App extends Component {
             // Create hashed array with channel details
             let subInfo = {};
             for (let i = 0 ; i < subs.length ; i++) {
-                subInfo[subs[i].channelId] = subs[i];
+                subInfo[subs[i].resourceId.channelId] = subs[i];
             }
 
             this.setState({subs});
@@ -187,11 +187,27 @@ class App extends Component {
         try {
             const { subs } = this.state;
 
+            let promises = [];
+
             for (let i = 0 ; i < subs.length ; i++) {
-                await this.fetchLatestVideos(subs[i].resourceId.channelId);
+                promises.push(this.fetchLatestVideos(subs[i].resourceId.channelId));
             }
 
-            console.log(this.state.stagingArea);
+            await Promise.all(promises);
+
+            // const { stagingArea } = this.state;
+            //
+            // this.sortByDate(stagingArea, 'lastPublishedVideo');
+
+            // let channelIds = Object.keys(this.state.stagingArea);
+            //
+            // console.log(channelIds);
+            //
+            // this.sortKeysByDate(channelIds, this.state.stagingArea, 'lastPublishedVideo');
+            //
+            // console.log(channelIds);
+
+            // console.log(this.state.stagingArea);
         }
         catch (err) {
             throw new Error(err);
@@ -202,6 +218,73 @@ class App extends Component {
         array.sort((a, b) => {
             return new Date(b[key]) - new Date(a[key]);
         })
+    }
+
+    sortKeysByDate = (keyList, object, property) => {
+        keyList.sort((a, b) => {
+            return new Date(object[a][property]) - new Date(object[b][property]);
+        })
+    }
+
+    populateSubBox = async () => {
+
+        let { subBox } = this.state;
+        let maxVideos = 50;
+
+        while (subBox.length < maxVideos) {
+            let { stagingArea } = this.state;
+
+            let channelIds = Object.keys(stagingArea);
+
+            let lastPublishedVideo = new Date(0);
+            let lastPublisher;
+
+            // Get latest video
+            for (let channelNo = 0 ; channelNo < channelIds.length ; channelNo ++) {
+                const channelId = channelIds[channelNo];
+
+                const channel = stagingArea[channelId];
+
+                if (new Date(channel.lastPublishedVideo) > new Date(lastPublishedVideo)) {
+                    lastPublishedVideo = channel.lastPublishedVideo;
+                    lastPublisher = channelId;
+                }
+            }
+
+            if (!lastPublisher) {
+                break;
+            }
+
+            let channel = stagingArea[lastPublisher];
+
+            // Store the latest video
+            subBox.push({
+                title: channel.videos[0].title,
+                channel: this.state.subInfo[lastPublisher].title,
+                publishedAt: channel.videos[0].publishedAt,
+                thumbnail: channel.videos[0].thumbnails.default,
+                url: 'https://www.youtube.com/watch?v=' + channel.videos[0].resourceId.videoId
+            });
+
+            // Remove latest video
+            channel.videos.splice(0, 1);
+
+            // Get new videos from the channel if the stored ones have been used
+            if (channel.videos.length === 0) {
+                await this.setState({stagingArea});
+                await this.fetchLatestVideos(lastPublisher);
+                stagingArea = this.state.stagingArea;
+                channel = stagingArea[lastPublisher];
+            }
+            else {
+                channel.lastPublishedVideo = channel.videos[0].publishedAt;
+                stagingArea[lastPublisher] = channel;
+            }
+        }
+
+        console.log(subBox);
+
+        this.setState({subBox});
     }
 
     componentDidMount = async () => {
@@ -229,8 +312,9 @@ class App extends Component {
 
                 await this.fetchSubs();
 
-                // this.fetchLatestVideos('UC7A_dLnSAjl7uROCdoNyjzg');
-                this.initStagingArea();
+                await this.initStagingArea();
+
+                this.populateSubBox();
 
                 // TODO: Save the list of subs
                 // Use search for each channel id and retrieve their videos
@@ -272,11 +356,16 @@ class App extends Component {
             <li> {subs[value].title} </li>
         ));
 
+        const { subBox } = this.state;
+        const videoList = subBox.map((index, value) => (
+            <li> {subBox[value].title} </li>
+        ));
+
         return (
             <div className = 'App'>
-                Subscriptions: { subs.length }
-                <br/>
-                <ul> { subList } </ul>
+
+                    <SubBox />
+
             </div>
         );
     }
@@ -289,3 +378,7 @@ export default App;
 //     closeModal = {this.closeModal}
 //     saveToLocalStorage = {this.saveToLocalStorage}
 // />
+
+// Videos: { videoList.length }
+// <br/>
+// <ul> { videoList } </ul>
