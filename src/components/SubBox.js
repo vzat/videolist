@@ -1,25 +1,43 @@
 import React, { Component } from 'react';
 import './css/App.css';
 
-const OAUTH2_CLIENT_ID = '537371083703-tt6pkisgd198nrr04b3tb5mepdi22fep.apps.googleusercontent.com';
-const OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
+import { Card, Image } from 'semantic-ui-react';
 
 class SubBox extends Component {
-    state = {
-        subBox: []
-    }
-
     render() {
-        const { subBox } = this.state;
-        const videoList = subBox.map((index, value) => (
-            <li> {subBox[value].title} </li>
+        const { subBox } = this.props;
+        const currentTime = (new Date());
+        const videos = subBox.map((index, value) => (
+            <Card href = {subBox[value].url} >
+                <Image src = {subBox[value].thumbnail.url} />
+                <Card.Content>
+                    <Card.Header> {subBox[value].title} </Card.Header>
+                    <Card.Meta>
+                        {subBox[value].channel}
+                    </Card.Meta>
+                    <Card.Meta>
+                        {
+                            currentTime - new Date(subBox[value].publishedAt) < 360000 &&
+                            Math.trunc((currentTime - new Date(subBox[value].publishedAt)) / 60000) + ' minute(s) ago'
+                        }
+                        {
+                            currentTime - new Date(subBox[value].publishedAt) > 360000 && currentTime - new Date(subBox[value].publishedAt) < 86400000 &&
+                            Math.trunc((currentTime - new Date(subBox[value].publishedAt)) / 3600000) + ' hour(s) ago'
+                        }
+                        {
+                            currentTime - new Date(subBox[value].publishedAt) > 86400000 &&
+                            Math.trunc((currentTime - new Date(subBox[value].publishedAt)) / 86400000) + ' day(s) ago'
+                        }
+                    </Card.Meta>
+                </Card.Content>
+            </Card>
         ));
 
         return (
             <div className = 'SubBox'>
-                Videos: { videoList.length }
-                <br/>
-                <ul> { videoList } </ul>
+                <Card.Group stackable>
+                    {videos}
+                </Card.Group>
             </div>
         );
     }

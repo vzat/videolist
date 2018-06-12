@@ -262,7 +262,7 @@ class App extends Component {
                 title: channel.videos[0].title,
                 channel: this.state.subInfo[lastPublisher].title,
                 publishedAt: channel.videos[0].publishedAt,
-                thumbnail: channel.videos[0].thumbnails.default,
+                thumbnail: channel.videos[0].thumbnails.standard,
                 url: 'https://www.youtube.com/watch?v=' + channel.videos[0].resourceId.videoId
             });
 
@@ -281,8 +281,6 @@ class App extends Component {
                 stagingArea[lastPublisher] = channel;
             }
         }
-
-        console.log(subBox);
 
         this.setState({subBox});
     }
@@ -351,21 +349,24 @@ class App extends Component {
     }
 
     render() {
-        const { subs } = this.state;
-        const subList = subs.map((index, value) => (
-            <li> {subs[value].title} </li>
-        ));
-
-        const { subBox } = this.state;
-        const videoList = subBox.map((index, value) => (
-            <li> {subBox[value].title} </li>
-        ));
+        // const { subs } = this.state;
+        // const subList = subs.map((index, value) => (
+        //     <li> {subs[value].title} </li>
+        // ));
+        //
+        // const { subBox } = this.state;
+        // const videoList = subBox.map((index, value) => (
+        //     <li> {subBox[value].title} </li>
+        // ));
 
         return (
             <div className = 'App'>
-
-                    <SubBox />
-
+                {
+                    this.state.page === 'subBox' &&
+                    <SubBox
+                        subBox = {this.state.subBox}
+                    />
+                }
             </div>
         );
     }
