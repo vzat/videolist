@@ -3,8 +3,12 @@ import './css/App.css';
 
 import SubBox from './SubBox';
 
+import gapiB from './lib/gapi-base.js'
+
+// const API_KEY = 'AIzaSyB7niGu-h27sxsn-UIQr399-p4tUB0TWLI';
 const OAUTH2_CLIENT_ID = '537371083703-tt6pkisgd198nrr04b3tb5mepdi22fep.apps.googleusercontent.com';
 const OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
+const YT_DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"];
 
 class App extends Component {
     state = {
@@ -18,11 +22,16 @@ class App extends Component {
         page: 'subBox'
     }
 
+    gapiLoaded = () => {
+        console.log("gapi loaded");
+    };
+
     loadApi = async (script) => {
         try {
             while (!script.getAttribute('gapi_processed')) {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
+            // await window.gapi.load('client:auth2');
             await window.gapi.client.load('youtube', 'v3');
         }
         catch (err) {
@@ -37,6 +46,17 @@ class App extends Component {
                 scope: OAUTH2_SCOPES,
                 immediate: false
             });
+
+            // console.log("Before");
+
+            await window.gapi.client.init({discoveryDocs: YT_DISCOVERY_DOCS});
+
+            // const response = await window.gapi.client.init({
+            //     apiKey: API_KEY,
+            //     client_id: OAUTH2_CLIENT_ID,
+            //     discoveryDocs: YT_DISCOVERY_DOCS,
+            //     scope: OAUTH2_SCOPES
+            // });
 
             if (response && !response.error) {
                 this.saveToLocalStorage('access_token', response.access_token);
@@ -287,43 +307,49 @@ class App extends Component {
 
     componentDidMount = async () => {
         try {
-            const script = document.createElement('script');
-            script.src = 'https://apis.google.com/js/client.js';
+            const clientComponents = [{name: 'youtube', version: 'v3'}];
 
-            script.onload = async () => {
-                let accessToken = this.getFromLocalStorage('access_token');
-                let expiresAt = this.getFromLocalStorage('expires_at');
+            await gapiB.load(clientComponents);
 
-                // Wait for script to load
-                // Load the youtube component
-                await this.loadApi(script);
+            await gapiB.authorize(OAUTH2_CLIENT_ID, OAUTH2_SCOPES, YT_DISCOVERY_DOCS);
 
-                if (!accessToken || !expiresAt || expiresAt <= new Date().getTime() / 1000 - 10) {
-                    await this.authoriseApi();
-
-                    // Get new token
-                    accessToken = this.getFromLocalStorage('access_token');
-                }
-
-                // Set the access token for the requests
-                window.gapi.client.setToken({access_token: accessToken});
-
-                await this.fetchSubs();
-
-                await this.initStagingArea();
-
-                this.populateSubBox();
-
-                // TODO: Save the list of subs
-                // Use search for each channel id and retrieve their videos
-                // Order videos based on the publishedAt time
-                // Keep a list of unprocessed videos for each channel
-                // Get older videos if the unprocessed list is empty
-                // Do this until the page is filled? (50?)
-                // Load more when the user scrolls down
-            };
-
-            document.body.appendChild(script);
+            // const script = document.createElement('script');
+            // script.src = 'https://apis.google.com/js/client:auth2.js';
+            //
+            // script.onload = async () => {
+            //     let accessToken = this.getFromLocalStorage('access_token');
+            //     let expiresAt = this.getFromLocalStorage('expires_at');
+            //
+            //     // Wait for script to load
+            //     // Load the youtube component
+            //     await this.loadApi(script);
+            //
+            //     if (!accessToken || !expiresAt || expiresAt <= new Date().getTime() / 1000 - 10) {
+            //         await this.authoriseApi();
+            //
+            //         // Get new token
+            //         accessToken = this.getFromLocalStorage('access_token');
+            //     }
+            //
+            //     // Set the access token for the requests
+            //     window.gapi.client.setToken({access_token: accessToken});
+            //
+            //     await this.fetchSubs();
+            //
+            //     await this.initStagingArea();
+            //
+            //     this.populateSubBox();
+            //
+            //     // TODO: Save the list of subs
+            //     // Use search for each channel id and retrieve their videos
+            //     // Order videos based on the publishedAt time
+            //     // Keep a list of unprocessed videos for each channel
+            //     // Get older videos if the unprocessed list is empty
+            //     // Do this until the page is filled? (50?)
+            //     // Load more when the user scrolls down
+            // };
+            //
+            // document.body.appendChild(script);
         }
         catch (err) {
             throw new Error(JSON.stringify(err));
