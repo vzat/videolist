@@ -1,10 +1,3 @@
-// const API_KEY = 'AIzaSyB7niGu-h27sxsn-UIQr399-p4tUB0TWLI';
-// const OAUTH2_CLIENT_ID = '537371083703-tt6pkisgd198nrr04b3tb5mepdi22fep.apps.googleusercontent.com';
-// const OAUTH2_SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
-// const YT_DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"];
-
-// const clientComponents = [{name: 'youtube', version: 'v3'}];
-
 const gapiB = {
     // clientComponents: name*, version
     load: async (clientComponents) => {
