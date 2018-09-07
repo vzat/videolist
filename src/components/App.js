@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import './css/App.css';
 
 import SubBox from './SubBox';
+import VideoGrid from './VideoGrid';
 
+import common from './lib/common';
 import gapiB from './lib/gapi-base.js';
 import gapiYT from './lib/gapi-yt.js';
 
@@ -32,6 +34,8 @@ class App extends Component {
             }
 
             subBox = await gapiYT.populateSubBox(subBox, 50);
+
+            console.log(common.durationToSec('PT17M41S'));
 
             console.log(subBox);
 
@@ -74,6 +78,14 @@ class App extends Component {
 
         return (
             <div className = 'App'>
+                <VideoGrid
+                    thumbnail = 'url'
+                    length = '32'
+                    title = 'Title'
+                    channel = 'Channel'
+                    views = '100000'
+                    publishedAt = '01-01-1970'
+                />
                 {
                     // this.state.page === 'subBox' &&
                     // <SubBox
