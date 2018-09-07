@@ -320,10 +320,16 @@ class App extends Component {
                   sessionStorage.setItem('subs-fetched', true);
             }
 
+            let {subBox} = this.state;
+            subBox = await gapiYT.populateSubBox(subBox, 50);
+            console.log(subBox);
+
+            await this.setState({subBox});
+
             // const subs = await JSON.parse(localStorage.getItem('subscriptions'));
             // console.log(subs);
-            const videos = await gapiYT.fetchLatestVideos('UC7A_dLnSAjl7uROCdoNyjzg');
-            console.log(videos);
+            // const videos = await gapiYT.fetchLatestVideos('UC7A_dLnSAjl7uROCdoNyjzg');
+            // console.log(videos);
 
             // subs = data.subs;
             // subInfo = data.subInfo;
@@ -418,10 +424,10 @@ class App extends Component {
         return (
             <div className = 'App'>
                 {
-                    this.state.page === 'subBox' &&
-                    <SubBox
-                        subBox = {this.state.subBox}
-                    />
+                    // this.state.page === 'subBox' &&
+                    // <SubBox
+                    //     subBox = {this.state.subBox}
+                    // />
                 }
             </div>
         );

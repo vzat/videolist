@@ -1,10 +1,8 @@
 import common from './common.js';
 
-let subs;
-let stagingArea;
-let subBox;
-
 let nextPageTokens = {};
+let videosLeft = {};
+let stagingArea = [];
 
 const gapiYT = {
     fetchSubs: async () => {
@@ -77,76 +75,129 @@ const gapiYT = {
             nextPageTokens[channelId] = videoListPart.result.nextPageToken;
             if (!nextPageTokens[channelId]) nextPageTokens[channelId] = null;
 
+            // Store the number of videos returned
+            if (!videosLeft[channelId]) videosLeft[channelId] = 0;
+            videosLeft[channelId] += videos.length;
+
             return videos;
         }
         catch (err) {
             throw new Error(err);
         }
     },
-    initStagingArea: async (subs, stagingArea) => {
+    initStagingArea: async () => {
         try {
             let promises = [];
 
+            const subs = await JSON.parse(localStorage.getItem('subscriptions'));
+
             for (let i = 0 ; i < subs.length ; i++) {
-                promises.push(this.fetchLatestVideos(subs[i].resourceId.channelId, stagingArea));
+                promises.push(gapiYT.fetchLatestVideos(subs[i].resourceId.channelId));
             }
 
-            await Promise.all(promises);
+            const videos = await Promise.all(promises);
+
+            for (const idx in videos) {
+                const videoGroup = videos[idx];
+
+                stagingArea.push(...videoGroup);
+            }
+
+            common.sortByDate(stagingArea, 'publishedAt');
         }
         catch (err) {
             throw new Error(err);
         }
     },
-    populateSubBox: async (subBox, stagingArea) => {
-        let maxVideos = 50;
-
-        while (subBox.length < maxVideos) {
-            let channelIds = Object.keys(stagingArea);
-
-            let lastPublishedVideo = new Date(0);
-            let lastPublisher;
-
-            // Get latest video
-            for (let channelNo = 0 ; channelNo < channelIds.length ; channelNo ++) {
-                const channelId = channelIds[channelNo];
-
-                const channel = stagingArea[channelId];
-
-                if (new Date(channel.lastPublishedVideo) > new Date(lastPublishedVideo)) {
-                    lastPublishedVideo = channel.lastPublishedVideo;
-                    lastPublisher = channelId;
-                }
-            }
-
-            if (!lastPublisher) {
-                break;
-            }
-
-            let channel = stagingArea[lastPublisher];
-
-            // Store the latest video
-            subBox.push({
-                title: channel.videos[0].title,
-                channel: this.state.subInfo[lastPublisher].title,
-                publishedAt: channel.videos[0].publishedAt,
-                thumbnail: channel.videos[0].thumbnails.standard,
-                url: 'https://www.youtube.com/watch?v=' + channel.videos[0].resourceId.videoId
-            });
-
-            // Remove latest video
-            channel.videos.splice(0, 1);
-
-            // Get new videos from the channel if the stored ones have been used
-            if (channel.videos.length === 0) {
-                await this.fetchLatestVideos(lastPublisher, stagingArea);
-                stagingArea = this.state.stagingArea;
-                channel = stagingArea[lastPublisher];
-            }
-            else {
-                channel.lastPublishedVideo = channel.videos[0].publishedAt;
-                stagingArea[lastPublisher] = channel;
-            }
+    updateStagingArea: async (channelId) => {
+        try {
+            const videos = await gapiYT.fetchLatestVideos(channelId);
+            stagingArea.push(...videos);
+            common.sortByDate(stagingArea, 'publishedAt');
         }
+        catch (err) {
+            throw new Error(err);
+        }
+    },
+    populateSubBox: async (subBox, maxVideos) => {
+        try {
+            if (stagingArea.length == 0) {
+                await gapiYT.initStagingArea();
+            }
+
+            let idx = subBox.length;
+            while (subBox.length < maxVideos) {
+                // !!! WARNING
+                if (idx >= stagingArea.length) return subBox;
+
+                const video = stagingArea[idx];
+
+                subBox.push(video);
+                videosLeft[video.channelId] --;
+
+                // All the videos from the channel have been fetched
+                // Get new ones, insert them into the stagingArea and sort it
+                if (videosLeft[video.channelId] < 1) {
+                    await gapiYT.updateStagingArea(video.channelId);
+                }
+
+                idx ++;
+            }
+
+            return subBox;
+        }
+        catch (err) {
+            throw new Error(err);
+        }
+
+
+        // while (subBox.length < maxVideos) {
+        //     let channelIds = Object.keys(stagingArea);
+        //
+        //     let lastPublishedVideo = new Date(0);
+        //     let lastPublisher;
+        //
+        //     // Get latest video
+        //     for (let channelNo = 0 ; channelNo < channelIds.length ; channelNo ++) {
+        //         const channelId = channelIds[channelNo];
+        //
+        //         const channel = stagingArea[channelId];
+        //
+        //         if (new Date(channel.lastPublishedVideo) > new Date(lastPublishedVideo)) {
+        //             lastPublishedVideo = channel.lastPublishedVideo;
+        //             lastPublisher = channelId;
+        //         }
+        //     }
+        //
+        //     if (!lastPublisher) {
+        //         break;
+        //     }
+        //
+        //     let channel = stagingArea[lastPublisher];
+        //
+        //     // Store the latest video
+        //     subBox.push({
+        //         title: channel.videos[0].title,
+        //         channel: this.state.subInfo[lastPublisher].title,
+        //         publishedAt: channel.videos[0].publishedAt,
+        //         thumbnail: channel.videos[0].thumbnails.standard,
+        //         url: 'https://www.youtube.com/watch?v=' + channel.videos[0].resourceId.videoId
+        //     });
+        //
+        //     // Remove latest video
+        //     channel.videos.splice(0, 1);
+        //
+        //     // Get new videos from the channel if the stored ones have been used
+        //     if (channel.videos.length === 0) {
+        //         await this.fetchLatestVideos(lastPublisher, stagingArea);
+        //         stagingArea = this.state.stagingArea;
+        //         channel = stagingArea[lastPublisher];
+        //     }
+        //     else {
+        //         channel.lastPublishedVideo = channel.videos[0].publishedAt;
+        //         stagingArea[lastPublisher] = channel;
+        //     }
+        // }
     }
 };
 
