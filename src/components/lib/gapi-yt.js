@@ -149,55 +149,6 @@ const gapiYT = {
         catch (err) {
             throw new Error(err);
         }
-
-
-        // while (subBox.length < maxVideos) {
-        //     let channelIds = Object.keys(stagingArea);
-        //
-        //     let lastPublishedVideo = new Date(0);
-        //     let lastPublisher;
-        //
-        //     // Get latest video
-        //     for (let channelNo = 0 ; channelNo < channelIds.length ; channelNo ++) {
-        //         const channelId = channelIds[channelNo];
-        //
-        //         const channel = stagingArea[channelId];
-        //
-        //         if (new Date(channel.lastPublishedVideo) > new Date(lastPublishedVideo)) {
-        //             lastPublishedVideo = channel.lastPublishedVideo;
-        //             lastPublisher = channelId;
-        //         }
-        //     }
-        //
-        //     if (!lastPublisher) {
-        //         break;
-        //     }
-        //
-        //     let channel = stagingArea[lastPublisher];
-        //
-        //     // Store the latest video
-        //     subBox.push({
-        //         title: channel.videos[0].title,
-        //         channel: this.state.subInfo[lastPublisher].title,
-        //         publishedAt: channel.videos[0].publishedAt,
-        //         thumbnail: channel.videos[0].thumbnails.standard,
-        //         url: 'https://www.youtube.com/watch?v=' + channel.videos[0].resourceId.videoId
-        //     });
-        //
-        //     // Remove latest video
-        //     channel.videos.splice(0, 1);
-        //
-        //     // Get new videos from the channel if the stored ones have been used
-        //     if (channel.videos.length === 0) {
-        //         await this.fetchLatestVideos(lastPublisher, stagingArea);
-        //         stagingArea = this.state.stagingArea;
-        //         channel = stagingArea[lastPublisher];
-        //     }
-        //     else {
-        //         channel.lastPublishedVideo = channel.videos[0].publishedAt;
-        //         stagingArea[lastPublisher] = channel;
-        //     }
-        // }
     }
 };
 
