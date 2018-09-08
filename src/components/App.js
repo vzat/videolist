@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './css/App.css';
 
-import SubBox from './SubBox';
+// import SubBox from './SubBox';
 import VideoGrid from './VideoGrid';
 
 import common from './lib/common';
