@@ -66,9 +66,28 @@ const gapiYT = {
                 nextPageToken: nextPageToken
             });
 
+            let videoIds = '';
+
             // Extract videos
             for (let i = 0 ; i < videoListPart.result.items.length ; i++) {
                 videos.push(videoListPart.result.items[i].snippet);
+                videoIds += videoListPart.result.items[i].snippet.resourceId.videoId;
+
+                if (i + 1 < videoListPart.result.items.length) videoIds += ',';
+            }
+
+            // Get more data on the videos
+            const videoListPartInfo = await window.gapi.client.youtube.videos.list({
+                id: videoIds,
+                part: 'contentDetails,statistics'
+            });
+
+            for (let i = 0 ; i < videoListPart.result.items.length ; i++) {
+                videos[i] = {
+                  ...videos[i],
+                  ...videoListPartInfo.result.items[i].contentDetails,
+                  ...videos[i].statistics = videoListPartInfo.result.items[i].statistics
+                };
             }
 
             // Store the next page token
@@ -121,7 +140,7 @@ const gapiYT = {
     },
     populateSubBox: async (subBox, maxVideos) => {
         try {
-            if (stagingArea.length == 0) {
+            if (stagingArea.length === 0) {
                 await gapiYT.initStagingArea();
             }
 
