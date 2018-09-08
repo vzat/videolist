@@ -86,7 +86,7 @@ const gapiYT = {
                 videos[i] = {
                   ...videos[i],
                   ...videoListPartInfo.result.items[i].contentDetails,
-                  ...videos[i].statistics = videoListPartInfo.result.items[i].statistics
+                  ...videoListPartInfo.result.items[i].statistics
                 };
             }
 

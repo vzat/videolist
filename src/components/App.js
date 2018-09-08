@@ -35,6 +35,8 @@ class App extends Component {
 
             subBox = await gapiYT.populateSubBox(subBox, 50);
 
+            console.log(subBox);
+
             await this.setState({subBox});
         }
         catch (err) {
@@ -75,12 +77,12 @@ class App extends Component {
         return (
             <div className = 'App'>
                 <VideoGrid
-                    thumbnail = 'url'
-                    length = '32'
-                    title = 'Title'
-                    channel = 'Channel'
-                    views = '100000'
-                    publishedAt = '01-01-1970'
+                    thumbnail = "https://i.ytimg.com/vi/7_Prt1yjtyM/mqdefault.jpg"
+                    length = '17:09'
+                    title = "A NEW STAR WARS STORY | Gmod TTT"
+                    channelTitle = "YOGSCAST Lewis & Simon"
+                    views = "190976"
+                    publishedAt = "2018-09-07T17:00:00.000Z"
                 />
                 {
                     // this.state.page === 'subBox' &&
