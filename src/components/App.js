@@ -35,10 +35,6 @@ class App extends Component {
 
             subBox = await gapiYT.populateSubBox(subBox, 50);
 
-            console.log(common.durationToSec('PT17M41S'));
-
-            console.log(subBox);
-
             await this.setState({subBox});
         }
         catch (err) {

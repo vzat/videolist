@@ -10,7 +10,7 @@ const common = {
         })
     },
     durationToSec: (duration) => {
-        if (duration.length === 0 || duration[0] != 'P') return -1;
+        if (duration.length === 0 || duration[0] !== 'P') return -1;
 
         let time = 0;
         let timeMul = 1;
@@ -49,6 +49,30 @@ const common = {
         }
 
         return time;
+    },
+    durationToString: (time) => {
+        let timeStr = '';
+        let curTimeVal;
+
+        while (time !== 0) {
+            if (time > 3600) {
+                // Hours
+                curTimeVal = 3600;
+            }
+            else if (time > 60) {
+                // Minutes
+                curTimeVal = 60;
+            }
+            else {
+                // Seconds
+                curTimeVal = 1;
+            }
+
+            timeStr += (Math.floor(time / curTimeVal) + ':');
+            time = time % curTimeVal;
+        }
+
+        return timeStr.substring(0, timeStr.length - 1);
     }
 };
 

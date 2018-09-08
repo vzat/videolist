@@ -140,7 +140,7 @@ const gapiYT = {
     },
     populateSubBox: async (subBox, maxVideos) => {
         try {
-            if (stagingArea.length == 0) {
+            if (stagingArea.length === 0) {
                 await gapiYT.initStagingArea();
             }
 

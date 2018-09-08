@@ -17,4 +17,12 @@ describe ('common', () => {
             expect(common.durationToSec('String')).toEqual(-1);
         });
     });
+    describe('durationToString(int time)', () => {
+        it ('converts duration in seconds to a string', () => {
+            let time = 21109;
+            let timeStr = '5:51:49';
+
+            expect(common.durationToString(time)).toEqual(timeStr);
+        });
+    });
 });
