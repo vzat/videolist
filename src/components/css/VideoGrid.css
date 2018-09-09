@@ -1,6 +1,6 @@
-.VideoGrid {
+/* .VideoGrid {
     width: 225px;
-}
+} */
 
 .grid-row {
     padding-top: 5px;
@@ -19,10 +19,43 @@
     float: right;
 }
 
-.video-length {
-    background-color: #222;
+.thumbnail-container {
+    position: relative;
 }
 
-.thumbnail-container {
+.video-length {
+    background-color: rgba(0, 0, 0, .8);
+    display: inline-block;
+    margin: 3px;
+    padding: 2px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
 
+    pointer-events: none;
+}
+
+.like-dislike {
+    height: 4px;
+    margin: 0px;
+}
+
+.no-decoration-link-primary, .no-decoration-link-primary:visited, .no-decoration-link-primary:link {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.no-decoration-link-primary:hover, .no-decoration-link-primary:active {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.no-decoration-link-secondary, .no-decoration-link-secondary:visited, .no-decoration-link-secondary:link {
+    text-decoration: none;
+    color: #808080;
+}
+
+.no-decoration-link-secondary:hover, .no-decoration-link-secondary:active {
+    text-decoration: none;
+    color: #ffffff;
 }

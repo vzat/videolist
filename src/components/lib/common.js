@@ -86,6 +86,23 @@ const common = {
 
         return str;
     },
+    numToStr: (num) => {
+        let counter = 0;
+        let revStr = '';
+        while (num) {
+            counter ++;
+
+            revStr += (num % 10);
+            num = Math.floor(num / 10);
+
+            if (counter === 3 && Math.floor(num / 10) !== 0) {
+                revStr += ',';
+                counter = 0;
+            }
+        }
+
+        return revStr.split('').reverse().join('');
+    },
     numToShortStr: (num) => {
         if (num > 999999) {
             // Millions

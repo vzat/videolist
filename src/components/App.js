@@ -83,6 +83,10 @@ class App extends Component {
                     channelTitle = "YOGSCAST Lewis & Simon"
                     views = "190976"
                     publishedAt = "2018-09-07T17:00:00.000Z"
+                    likes = {90}
+                    dislikes = {10}
+                    videoLink = 'https://www.youtube.com/watch?v=7_Prt1yjtyM&t=0s'
+                    channelLink = 'https://www.youtube.com/channel/UCH-_hzb2ILSCo9ftVSnrCIQ'
                 />
                 {
                     // this.state.page === 'subBox' &&

@@ -33,6 +33,17 @@ describe ('common', () => {
             expect(common.trimStr(str, 26)).toEqual(correctStr);
         });
     });
+    describe('numToStr(int num)', () => {
+        it ('converts a number to string', () => {
+            const num1 = 152;
+            const num2 = 45678;
+            const num3 = 123789456;
+
+            expect(common.numToStr(num1)).toEqual('152');
+            expect(common.numToStr(num2)).toEqual('45,678');
+            expect(common.numToStr(num3)).toEqual('123,789,456');
+        });
+    });
     describe('numToShortStr(int num)', () => {
         it ('converts a number to string and makes it shorter', () => {
             const num1 = 152;
