@@ -1,36 +1,11 @@
 .App {
-    min-height: 100vh;
-    min-width: 100vh;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    overflow: auto;
 
     background-color: #222;
     color: #FFF;
 
     padding: 25px;
 }
-
-.ui.modal>.header {
-    background-color: #222;
-    color: #FFF;
-}
-
-.ui.modal>.content {
-    background-color: #222;
-    color: #FFF;
-}
-
-.ui.modal>.actions {
-    background-color: #222;
-    color: #FFF;
-}
-
-/* .ui.cards>.card, .ui.cards>.card:hover {
-    background-color: #222;
-}
-
-.ui.card>.content>.header, .ui.cards>.card>.content>.header {
-    color: white
-}
-
-.ui.card .meta, .ui.cards>.card .meta {
-    color: white;
-} */

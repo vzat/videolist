@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './css/VideoGrid.css';
 
-import { Grid, Row, Col, ProgressBar, Tooltip, OverlayTrigger, Glyphicon } from 'react-bootstrap';
+import { Grid, Row, ProgressBar, Tooltip, OverlayTrigger, Glyphicon } from 'react-bootstrap';
 
 import common from './lib/common';
 
@@ -23,7 +23,7 @@ class VideoGrid extends Component {
         const {width, height} = this.state;
         const widthpx = width + 'px';
         const heightpx = height + 'px'
-        const {thumbnail, length, title, channelTitle, views, publishedAt, likes, dislikes, videoLink, channelLink} = this.props;
+        let {thumbnail, length, title, channelTitle, views, publishedAt, likes, dislikes, videoLink, channelLink} = this.props;
 
         // Styles
         const thumbnailStyle = {
@@ -34,7 +34,11 @@ class VideoGrid extends Component {
         };
 
         const videoGridStyle = {
-            width: widthpx
+            width: widthpx,
+            height: widthpx,
+            float: 'left',
+            marginRight: '10px',
+            marginBottom: '10px'
         };
 
         const videoLinkStyle = {
@@ -79,32 +83,32 @@ class VideoGrid extends Component {
             <Grid className = 'VideoGrid' style = {videoGridStyle}>
                 <Row className = 'grid-row'>
                     <OverlayTrigger id = 'likes-tooltip-overlay' placement = 'bottom' overlay = {likesTooltip} >
-                        <ProgressBar className = 'like-dislike' max = {likes + dislikes} now = {likes} />
+                        <ProgressBar className = 'like-dislike' max = {parseInt(likes) + parseInt(dislikes)} now = {likes} />
                     </OverlayTrigger>
                     <div className = 'thumbnail-container' style = {thumbnailStyle}>
-                        <a href = {videoLink} style = {videoLinkStyle} />
+                        <a href = {videoLink} target='_blank' style = {videoLinkStyle} />
                         <div className = 'video-length'> {length} </div>
                     </div>
                 </Row>
 
                 <Row className = 'grid-row'>
                     <OverlayTrigger id = 'title-tooltip-overlay' placement = 'top' overlay = {titleTooltip} delayShow = {1000}>
-                        <a href = {videoLink} className = 'no-decoration-link-primary'> { common.trimStr(title, 50) } </a>
+                        <a href = {videoLink} className = 'no-decoration-link-primary' target='_blank'> { common.trimStr(title, 50) } </a>
                     </OverlayTrigger>
                 </Row>
 
                 <Row className = 'grid-row-sec'>
                     <OverlayTrigger id = 'channel-tooltip-overlay' placement = 'top' overlay = {channelTooltip} delayShow = {1000}>
-                        <a href = {channelLink} className = 'no-decoration-link-secondary'> { common.trimStr(channelTitle, 25) } </a>
+                        <a href = {channelLink} className = 'no-decoration-link-secondary' target='_blank'> { common.trimStr(channelTitle, 25) } </a>
                     </OverlayTrigger>
                 </Row>
 
                 <Row className = 'grid-row-sec'>
-                    <OverlayTrigger id = 'views-tooltip-overlay' placement = 'right' overlay = {viewsTooltip} delayShow = {1000}>
+                    <OverlayTrigger id = 'views-tooltip-overlay' placement = 'top' overlay = {viewsTooltip} delayShow = {1000}>
                         <div className = 'left-col'> { common.numToShortStr(views) } </div>
                     </OverlayTrigger>
 
-                    <OverlayTrigger id = 'published-at-tooltip-overlay' placement = 'left' overlay = {publishedAtTooltip} delayShow = {1000}>
+                    <OverlayTrigger id = 'published-at-tooltip-overlay' placement = 'top' overlay = {publishedAtTooltip} delayShow = {1000}>
                         <div className = 'right-col'> { common.timePassed(publishedAt) } </div>
                     </OverlayTrigger>
                 </Row>

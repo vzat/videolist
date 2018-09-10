@@ -1,43 +1,61 @@
 import React, { Component } from 'react';
-import './css/App.css';
+import './css/SubBox.css';
 
-import { Card, Image } from 'semantic-ui-react';
+import common from './lib/common';
+
+import VideoGridGroup from './VideoGridGroup';
 
 class SubBox extends Component {
-    render() {
-        const { subBox } = this.props;
-        const currentTime = (new Date());
-        const videos = subBox.map((index, value) => (
-            <Card href = {subBox[value].url} >
-                <Image src = {subBox[value].thumbnail.url} />
-                <Card.Content>
-                    <Card.Header> {subBox[value].title} </Card.Header>
-                    <Card.Meta>
-                        {subBox[value].channel}
-                    </Card.Meta>
-                    <Card.Meta>
-                        {
-                            currentTime - new Date(subBox[value].publishedAt) < 360000 &&
-                            Math.trunc((currentTime - new Date(subBox[value].publishedAt)) / 60000) + ' minute(s) ago'
-                        }
-                        {
-                            currentTime - new Date(subBox[value].publishedAt) > 360000 && currentTime - new Date(subBox[value].publishedAt) < 86400000 &&
-                            Math.trunc((currentTime - new Date(subBox[value].publishedAt)) / 3600000) + ' hour(s) ago'
-                        }
-                        {
-                            currentTime - new Date(subBox[value].publishedAt) > 86400000 &&
-                            Math.trunc((currentTime - new Date(subBox[value].publishedAt)) / 86400000) + ' day(s) ago'
-                        }
-                    </Card.Meta>
-                </Card.Content>
-            </Card>
-        ));
+    state = {
+        videos: []
+    }
 
+    updateVideos = (subBox) => {
+        console.log(subBox);
+
+        let {videos} = this.state;
+
+        for (let i = 0 ; i < subBox.length ; i ++) {
+            const subVid = subBox[i];
+
+            if (videos.length <= i || videos[i].videoId !== subBox[i].resourceId.videoId) {
+                let video = {};
+
+                video.videoId = subVid.resourceId.videoId;
+                video.thumbnail = subVid.thumbnails.medium.url ? subVid.thumbnails.medium.url : subVid.thumbnails.default.url;
+                video.length = common.durationToString(common.durationToSec(subVid.duration));
+                video.title = subVid.title;
+                video.channelTitle = subVid.channelTitle;
+                video.views = subVid.viewCount;
+                video.publishedAt = subVid.publishedAt;
+                video.likes = subVid.likeCount;
+                video.dislikes = subVid.dislikeCount;
+                video.videoLink = 'https://www.youtube.com/watch?v=' + subVid.resourceId.videoId;
+                video.channelLink = 'https://www.youtube.com/channel/' + subVid.channelId;
+
+                videos.push(video);
+            }
+        }
+
+        this.setState({videos});
+    }
+
+    componentDidMount = () => {
+        this.updateVideos(this.props.subBox);
+    }
+
+    componentWillReceiveProps = (nextProps) => {
+        if (nextProps.subBox.length >= this.props.subBox.length) {
+              this.updateVideos(nextProps.subBox);
+        }
+    }
+
+    render() {
         return (
             <div className = 'SubBox'>
-                <Card.Group stackable>
-                    {videos}
-                </Card.Group>
+                <VideoGridGroup
+                    videos = {this.state.videos}
+                />
             </div>
         );
     }
