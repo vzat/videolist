@@ -15,63 +15,7 @@ import {YT_DISCOVERY_DOCS} from './lib/macros.js';
 class App extends Component {
     state = {
         subBox: [],
-        page: 'subBox',
-        videos: [{
-            thumbnail: "https://i.ytimg.com/vi/7_Prt1yjtyM/mqdefault.jpg",
-            length: '17:09',
-            title: "A NEW STAR WARS STORY | Gmod TTT",
-            channelTitle: "YOGSCAST Lewis & Simon",
-            views: "190976",
-            publishedAt: "2018-09-07T17:00:00.000Z",
-            likes: 90,
-            dislikes: 10,
-            videoLink: 'https://www.youtube.com/watch?v=7_Prt1yjtyM&t=0s',
-            channelLink: 'https://www.youtube.com/channel/UCH-_hzb2ILSCo9ftVSnrCIQ'
-        }, {
-          thumbnail: "https://i.ytimg.com/vi/7_Prt1yjtyM/mqdefault.jpg",
-          length: '17:09',
-          title: "A NEW STAR WARS STORY | Gmod TTT",
-          channelTitle: "YOGSCAST Lewis & Simon",
-          views: "190976",
-          publishedAt: "2018-09-07T17:00:00.000Z",
-          likes: 90,
-          dislikes: 10,
-          videoLink: 'https://www.youtube.com/watch?v=7_Prt1yjtyM&t=0s',
-          channelLink: 'https://www.youtube.com/channel/UCH-_hzb2ILSCo9ftVSnrCIQ'
-        }, {
-          thumbnail: "https://i.ytimg.com/vi/7_Prt1yjtyM/mqdefault.jpg",
-          length: '17:09',
-          title: "A NEW STAR WARS STORY | Gmod TTT",
-          channelTitle: "YOGSCAST Lewis & Simon",
-          views: "190976",
-          publishedAt: "2018-09-07T17:00:00.000Z",
-          likes: 90,
-          dislikes: 10,
-          videoLink: 'https://www.youtube.com/watch?v=7_Prt1yjtyM&t=0s',
-          channelLink: 'https://www.youtube.com/channel/UCH-_hzb2ILSCo9ftVSnrCIQ'
-        }, {
-          thumbnail: "https://i.ytimg.com/vi/7_Prt1yjtyM/mqdefault.jpg",
-          length: '17:09',
-          title: "A NEW STAR WARS STORY | Gmod TTT",
-          channelTitle: "YOGSCAST Lewis & Simon",
-          views: "190976",
-          publishedAt: "2018-09-07T17:00:00.000Z",
-          likes: 90,
-          dislikes: 10,
-          videoLink: 'https://www.youtube.com/watch?v=7_Prt1yjtyM&t=0s',
-          channelLink: 'https://www.youtube.com/channel/UCH-_hzb2ILSCo9ftVSnrCIQ'
-        }, {
-          thumbnail: "https://i.ytimg.com/vi/7_Prt1yjtyM/mqdefault.jpg",
-          length: '17:09',
-          title: "A NEW STAR WARS STORY | Gmod TTT",
-          channelTitle: "YOGSCAST Lewis & Simon",
-          views: "190976",
-          publishedAt: "2018-09-07T17:00:00.000Z",
-          likes: 90,
-          dislikes: 10,
-          videoLink: 'https://www.youtube.com/watch?v=7_Prt1yjtyM&t=0s',
-          channelLink: 'https://www.youtube.com/channel/UCH-_hzb2ILSCo9ftVSnrCIQ'
-        }]
+        page: 'subBox'
     }
 
     componentDidMount = async () => {
@@ -91,12 +35,9 @@ class App extends Component {
 
             subBox = await gapiYT.populateSubBox(subBox, 50);
 
-            // console.log(subBox);
-
             await this.setState({subBox});
         }
         catch (err) {
-            console.log(err);
             throw new Error(JSON.stringify(err));
         }
     }

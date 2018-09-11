@@ -11,8 +11,6 @@ class SubBox extends Component {
     }
 
     updateVideos = (subBox) => {
-        console.log(subBox);
-
         let {videos} = this.state;
 
         for (let i = 0 ; i < subBox.length ; i ++) {
