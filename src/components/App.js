@@ -15,7 +15,8 @@ import {YT_DISCOVERY_DOCS} from './lib/macros.js';
 class App extends Component {
     state = {
         subBox: [],
-        page: 'subBox'
+        page: 'subBox',
+        endOfPage: false
     }
 
     componentDidMount = async () => {
@@ -36,6 +37,44 @@ class App extends Component {
             subBox = await gapiYT.populateSubBox(subBox, 50);
 
             await this.setState({subBox});
+
+            this.checkEndOfPage();
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    updateSubBox = async () => {
+        try {
+            let {subBox} = this.state;
+
+            subBox = await gapiYT.populateSubBox(subBox, subBox.length + 50);
+
+            await this.setState({subBox});
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    checkEndOfPage = async () => {
+        try {
+            const app = this.refs.app;
+
+            const scrollTop = app.scrollTop;
+            const maxScrollTop = app.scrollHeight - app.clientHeight
+            const per = scrollTop / maxScrollTop;
+
+            if (per > 0.9) {
+                await this.setState({endOfPage: true});
+                await this.updateSubBox();
+            }
+            else {
+                await this.setState({endOfPage: false});
+            }
+
+            setTimeout(this.checkEndOfPage, 1000);
         }
         catch (err) {
             throw new Error(JSON.stringify(err));
@@ -62,10 +101,12 @@ class App extends Component {
 
     render() {
         return (
-            <div className = 'App'>
+            <div ref = 'app' className = 'App'>
                 {
                     this.state.page === 'subBox' &&
                     <SubBox
+                        updateSubBox = {this.updateSubBox}
+                        endOfPage = {this.state.endOfPage}
                         subBox = {this.state.subBox}
                     />
                 }

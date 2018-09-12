@@ -50,10 +50,11 @@ class SubBox extends Component {
 
     render() {
         return (
-            <div className = 'SubBox'>
+            <div ref = 'subbox' className = 'SubBox'>
                 <VideoGridGroup
                     videos = {this.state.videos}
                 />
+                <div className = 'page-end-loading'> Loading... </div>
             </div>
         );
     }
