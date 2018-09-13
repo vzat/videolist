@@ -50,7 +50,7 @@ class SubBox extends Component {
 
     render() {
         return (
-            <div ref = 'subbox' className = 'SubBox'>
+            <div ref = 'subBox' className = 'SubBox'>
                 <VideoGridGroup
                     videos = {this.state.videos}
                 />

@@ -60,19 +60,22 @@ class App extends Component {
 
     checkEndOfPage = async () => {
         try {
-            const app = this.refs.app;
+            // const app = this.refs.app;
+            const app = document.documentElement;
 
             const scrollTop = app.scrollTop;
             const maxScrollTop = app.scrollHeight - app.clientHeight
             const per = scrollTop / maxScrollTop;
 
-            if (per > 0.9) {
+            if (maxScrollTop - scrollTop < 50) {
                 await this.setState({endOfPage: true});
                 await this.updateSubBox();
             }
             else {
                 await this.setState({endOfPage: false});
             }
+
+            console.log(scrollTop);
 
             setTimeout(this.checkEndOfPage, 1000);
         }

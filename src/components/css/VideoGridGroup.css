@@ -1,7 +1,4 @@
 .VideoGridGroup {
-    position: absolute;
-    /* min-height: 100vh; */
-    /* min-width: 100vh; */
-    /* position: relative; */
-    /* overflow: auto; */
+    position: relative;
+    overflow: auto;
 }
