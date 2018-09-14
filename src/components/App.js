@@ -15,14 +15,14 @@ import {YT_DISCOVERY_DOCS} from './lib/macros.js';
 class App extends Component {
     state = {
         subBox: [],
-        page: 'subBox',
+        page: 'none',
         endOfPage: false
     }
 
     componentDidMount = async () => {
         try {
             const clientComponents = [{name: 'youtube', version: 'v3'}];
-            let {subBox} = this.state;
+            // let {subBox} = this.state;
 
             await gapiB.load(clientComponents);
 
@@ -34,24 +34,9 @@ class App extends Component {
                   sessionStorage.setItem('subs-fetched', true);
             }
 
-            subBox = await gapiYT.populateSubBox(subBox, 50);
-
-            await this.setState({subBox});
+            await this.setState({page: 'subBox'});
 
             this.checkEndOfPage();
-        }
-        catch (err) {
-            throw new Error(JSON.stringify(err));
-        }
-    }
-
-    updateSubBox = async () => {
-        try {
-            let {subBox} = this.state;
-
-            subBox = await gapiYT.populateSubBox(subBox, subBox.length + 50);
-
-            await this.setState({subBox});
         }
         catch (err) {
             throw new Error(JSON.stringify(err));
@@ -67,15 +52,11 @@ class App extends Component {
             const maxScrollTop = app.scrollHeight - app.clientHeight
             const per = scrollTop / maxScrollTop;
 
-            if (maxScrollTop - scrollTop < 50) {
-                await this.setState({endOfPage: true});
-                await this.updateSubBox();
-            }
-            else {
-                await this.setState({endOfPage: false});
-            }
+            let endOfPage = maxScrollTop - scrollTop < 50 ? true : false;
 
-            console.log(scrollTop);
+            if (this.state.endOfPage !== endOfPage) {
+                await this.setState({endOfPage});
+            }
 
             setTimeout(this.checkEndOfPage, 1000);
         }
@@ -108,9 +89,7 @@ class App extends Component {
                 {
                     this.state.page === 'subBox' &&
                     <SubBox
-                        updateSubBox = {this.updateSubBox}
                         endOfPage = {this.state.endOfPage}
-                        subBox = {this.state.subBox}
                     />
                 }
             </div>

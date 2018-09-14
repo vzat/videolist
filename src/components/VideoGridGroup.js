@@ -6,8 +6,33 @@ import { Grid, Row } from 'react-bootstrap';
 import VideoGrid from './VideoGrid';
 
 class VideoGridGroup extends Component {
+    state = {
+        thumbnailWidth: 225,
+        thumbnailHeight: 126,
+        padding: 10
+    }
+
+    constructor (props) {
+        super (props);
+
+        // Calculate padding - WIP
+        // const pageWidth = document.documentElement.clientWidth;
+        // const thumbWithSep = this.state.thumbnailWidth + 10;
+        //
+        // const thumbsPerPage = Math.floor(pageWidth / thumbWithSep);
+        //
+        // let spaceWithThumbs = thumbsPerPage * thumbWithSep;
+        // if (spaceWithThumbs + this.state.thumbnailWidth < pageWidth) {
+        //     spaceWithThumbs += this.state.thumbnailWidth
+        // }
+        //
+        // this.state.padding = Math.floor((pageWidth - spaceWithThumbs) / 2);
+    }
+
     render() {
         const {videos} = this.props;
+        const {padding} = this.state;
+
         const videoGrid = videos.map((video, idx) => (
             <VideoGrid
                 thumbnail = {video.thumbnail}
@@ -20,11 +45,18 @@ class VideoGridGroup extends Component {
                 dislikes = {video.dislikes}
                 videoLink = {video.videoLink}
                 channelLink = {video.channelLink}
+
+                width = {this.state.thumbnailWidth}
+                height = {this.state.thumbnailHeight}
             />
         ));
 
+        const videoGridGroupStyle = {
+            padding: padding + 'px'
+        };
+
         return (
-            <div className = 'VideoGridGroup'>
+            <div className = 'VideoGridGroup' style = {videoGridGroupStyle}>
                 {videoGrid}
             </div>
         );

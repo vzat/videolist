@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import './css/SubBox.css';
 
 import common from './lib/common';
+import gapiYT from './lib/gapi-yt.js';
 
 import VideoGridGroup from './VideoGridGroup';
 
 class SubBox extends Component {
     state = {
+        subBox: [],
         videos: []
     }
 
@@ -38,13 +40,44 @@ class SubBox extends Component {
         this.setState({videos});
     }
 
-    componentDidMount = () => {
-        this.updateVideos(this.props.subBox);
+    updateSubBox = async () => {
+        try {
+            let {subBox} = this.state;
+
+            subBox = await gapiYT.populateSubBox(subBox, subBox.length + 50);
+
+            this.updateVideos(subBox);
+
+            await this.setState({subBox});
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
     }
 
-    componentWillReceiveProps = (nextProps) => {
-        if (nextProps.subBox.length >= this.props.subBox.length) {
-              this.updateVideos(nextProps.subBox);
+    componentDidMount = async () => {
+        try {
+            let {subBox} = this.state;
+
+            subBox = await gapiYT.populateSubBox(subBox, 50);
+
+            await this.setState({subBox});
+
+            this.updateVideos(subBox);
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    componentWillReceiveProps = async (nextProps) => {
+        try {
+            if (nextProps.endOfPage === true) {
+                await this.updateSubBox();
+            }
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
         }
     }
 
