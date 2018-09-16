@@ -66,6 +66,7 @@ class SubBox extends Component {
             this.updateVideos(subBox);
         }
         catch (err) {
+            console.log(err);
             throw new Error(JSON.stringify(err));
         }
     }

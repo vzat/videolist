@@ -16,17 +16,17 @@ class VideoGridGroup extends Component {
         super (props);
 
         // Calculate padding - WIP
-        // const pageWidth = document.documentElement.clientWidth;
-        // const thumbWithSep = this.state.thumbnailWidth + 10;
-        //
-        // const thumbsPerPage = Math.floor(pageWidth / thumbWithSep);
-        //
-        // let spaceWithThumbs = thumbsPerPage * thumbWithSep;
-        // if (spaceWithThumbs + this.state.thumbnailWidth < pageWidth) {
-        //     spaceWithThumbs += this.state.thumbnailWidth
-        // }
-        //
-        // this.state.padding = Math.floor((pageWidth - spaceWithThumbs) / 2);
+        const pageWidth = document.documentElement.clientWidth - 17;
+        const thumbWithSep = this.state.thumbnailWidth + 10;
+
+        const thumbsPerPage = Math.floor(pageWidth / thumbWithSep);
+
+        let spaceWithThumbs = thumbsPerPage * thumbWithSep;
+        if (spaceWithThumbs + this.state.thumbnailWidth < pageWidth) {
+            spaceWithThumbs += this.state.thumbnailWidth
+        }
+
+        this.state.padding = Math.floor((pageWidth - spaceWithThumbs) / 2);
     }
 
     render() {
@@ -52,7 +52,8 @@ class VideoGridGroup extends Component {
         ));
 
         const videoGridGroupStyle = {
-            padding: padding + 'px'
+            paddingTop: '10px',
+            paddingLeft: padding + 'px'
         };
 
         return (

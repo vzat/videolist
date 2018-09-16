@@ -1,6 +1,7 @@
 import common from './common.js';
 
-let nextPageTokens = {};
+let earliestPublishedAt = {}
+let videosFetched = {};
 let videosLeft = {};
 let stagingArea = [];
 
@@ -51,56 +52,93 @@ const gapiYT = {
     fetchLatestVideos: async (channelId) => {
         try {
             const playlistId = channelId[0] + 'U' + channelId.substring(2);
-            const nextPageToken = nextPageTokens[channelId];
             let videos = [];
+            let videoIds = '';
+            let nextPageToken = undefined;
 
             // All videos have been fetched
-            if (nextPageToken === null) {
+            if (earliestPublishedAt[channelId] === null) {
                 return videos;
             }
 
-            // Get new videos
-            const videoListPart = await window.gapi.client.youtube.playlistItems.list({
-                playlistId: playlistId,
-                part: 'snippet',
-                nextPageToken: nextPageToken
-            });
+            if (videosLeft[channelId] === undefined) videosLeft[channelId] = 0;
+            if (videosFetched[channelId] === undefined) videosFetched[channelId] = 0;
+            if (earliestPublishedAt[channelId] === undefined) earliestPublishedAt[channelId] = new Date();
 
-            let videoIds = '';
+            while (videos.length < 5 && nextPageToken !== null) {
+                const maxResults = Math.min(videosFetched[channelId] + 5, 50);
 
-            // Extract videos
-            for (let i = 0 ; i < videoListPart.result.items.length ; i++) {
-                videos.push(videoListPart.result.items[i].snippet);
-                videoIds += videoListPart.result.items[i].snippet.resourceId.videoId;
+                // Get new videos
+                const videoListPart = await window.gapi.client.youtube.playlistItems.list({
+                    playlistId: playlistId,
+                    part: 'snippet',
+                    nextPageToken,
+                    maxResults
+                });
 
-                if (i + 1 < videoListPart.result.items.length) videoIds += ',';
+                // Get the nextPageToken
+                nextPageToken = videoListPart.result.nextPageToken;
+
+                // 1. No videos have been fetched
+                // 2. Videos have been fetched in the past but the total amount is under 50
+                // 3. Videos have been fetched in the past and the total amount is over 50
+
+                // Find the first video that has not been fetched before
+                let videoNo;
+                for (videoNo = 0 ; videoNo < videoListPart.result.items.length ; videoNo ++) {
+                    const publishedAt = new Date(videoListPart.result.items[videoNo].snippet.publishedAt);
+
+                    if (publishedAt < earliestPublishedAt[channelId]) break;
+                }
+
+                console.log(videoNo, videoListPart.result.items.length);
+
+                // Extract videos - start from the first video not fetched before
+                for (let i = videoNo ; i < videoListPart.result.items.length ; i ++) {
+                    videos.push(videoListPart.result.items[i].snippet);
+                    videoIds += videoListPart.result.items[i].snippet.resourceId.videoId;
+
+                    if (i + 1 < videoListPart.result.items.length) {
+                        videoIds += ',';
+                    }
+                    else {
+                        earliestPublishedAt[channelId] = new Date(videoListPart.result.items[i].snippet.publishedAt);
+                    }
+                }
+
+                // No more videos left to fetch
+                if (!nextPageToken) nextPageToken = null;
             }
 
-            // Get more data on the videos
-            const videoListPartInfo = await window.gapi.client.youtube.videos.list({
-                id: videoIds,
-                part: 'contentDetails,statistics'
-            });
+            // Get more data about videos if any videos have been found
+            if (videoIds.length > 0) {
+                // Get more data on the videos
+                const videoListPartInfo = await window.gapi.client.youtube.videos.list({
+                    id: videoIds,
+                    part: 'contentDetails,statistics'
+                });
 
-            for (let i = 0 ; i < videoListPart.result.items.length ; i++) {
-                videos[i] = {
-                  ...videos[i],
-                  ...videoListPartInfo.result.items[i].contentDetails,
-                  ...videoListPartInfo.result.items[i].statistics
-                };
+                // console.log(videos.length, videoListPartInfo.result.items.length);
+
+                for (let i = 0 ; i < videoListPartInfo.result.items.length ; i ++) {
+                    videos[i] = {
+                      ...videos[i],
+                      ...videoListPartInfo.result.items[i].contentDetails,
+                      ...videoListPartInfo.result.items[i].statistics
+                    };
+                }
             }
 
-            // Store the next page token
-            nextPageTokens[channelId] = videoListPart.result.nextPageToken;
-            if (!nextPageTokens[channelId]) nextPageTokens[channelId] = null;
-
-            // Store the number of videos returned
-            if (!videosLeft[channelId]) videosLeft[channelId] = 0;
+            // Store the number of videos left to process and the total amount of videos fetched
             videosLeft[channelId] += videos.length;
+            videosFetched[channelId] += videos.length;
+
+            // console.log(videosLeft[channelId], videosFetched[channelId]);
 
             return videos;
         }
         catch (err) {
+            console.log(err);
             throw new Error(err);
         }
     },
@@ -125,6 +163,7 @@ const gapiYT = {
             common.sortByDate(stagingArea, 'publishedAt');
         }
         catch (err) {
+            console.log(err);
             throw new Error(err);
         }
     },
@@ -166,6 +205,7 @@ const gapiYT = {
             return subBox;
         }
         catch (err) {
+            console.log(err);
             throw new Error(err);
         }
     }

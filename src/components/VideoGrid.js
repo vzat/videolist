@@ -71,7 +71,10 @@ class VideoGrid extends Component {
             height: widthpx,
             float: 'left',
             marginRight: '10px',
-            marginBottom: '10px'
+            marginBottom: '10px',
+
+            // Fix for the page having an extra scrollbar
+            overflow: 'hidden'
         };
 
         const videoLinkStyle = {
