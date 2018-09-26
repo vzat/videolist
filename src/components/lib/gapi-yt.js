@@ -5,6 +5,7 @@ import common from './common.js';
 let videosLeft = {};
 let stagingArea = [];
 let videosFetched = new Set();
+let fetchPromises = {};
 
 const gapiYT = {
     fetchSubs: async () => {
@@ -452,6 +453,8 @@ const gapiYT = {
             const videos = await gapiYT.fetchLatestVideos(channelId);
             stagingArea.push(...videos);
             common.sortByDate(stagingArea, 'publishedAt');
+
+            // return true;
         }
         catch (err) {
             throw new Error(err);
@@ -470,14 +473,21 @@ const gapiYT = {
 
                 const video = stagingArea[idx];
 
+                await fetchPromises[video.channelId];
+
                 subBox.push(video);
                 videosLeft[video.channelId] --;
 
                 // All the videos from the channel have been fetched
                 // Get new ones, insert them into the stagingArea and sort it
                 // TODO: Maybe do this in parallel
-                if (videosLeft[video.channelId] < 1) {
-                    await gapiYT.updateStagingArea(video.channelId);
+                // if (videosLeft[video.channelId] < 1) {
+                //     await gapiYT.updateStagingArea(video.channelId);
+                // }
+
+                if (videosLeft[video.channelId] < 2) {
+                    fetchPromises[video.channelId] = gapiYT.updateStagingArea(video.channelId);
+                    // console.log(fetchPromises[video.channelId]);
                 }
 
                 idx ++;

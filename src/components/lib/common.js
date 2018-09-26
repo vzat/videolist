@@ -52,19 +52,21 @@ const common = {
     },
     durationToString: (time) => {
         let timeStr = '';
-        let curTimeVal;
+        let curTimeVal = -1;
         let noZero = true;
 
         while (time !== 0) {
-            if (time > 3600) {
+            if (time >= 3600) {
                 // Hours
                 curTimeVal = 3600;
             }
-            else if (time > 60) {
+            else if (time >= 60) {
                 // Minutes
                 curTimeVal = 60;
             }
             else {
+                if (curTimeVal === -1) noZero = false;
+
                 // Seconds
                 curTimeVal = 1;
             }
@@ -75,6 +77,17 @@ const common = {
             time = time % curTimeVal;
 
             noZero = false;
+        }
+
+        if (curTimeVal === 3600) {
+            timeStr += '00:00:';
+        }
+        else if (curTimeVal === 60) {
+            timeStr += '00:';
+        }
+
+        if (timeStr.length === 3) {
+            timeStr = '0:' + timeStr;
         }
 
         return timeStr.substring(0, timeStr.length - 1);

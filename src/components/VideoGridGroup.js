@@ -16,7 +16,42 @@ class VideoGridGroup extends Component {
         super (props);
 
         // Calculate padding - WIP
-        const pageWidth = document.documentElement.clientWidth - 17;
+        // const pageWidth = document.documentElement.clientWidth - 17;
+        // const thumbWithSep = this.state.thumbnailWidth + 10;
+        //
+        // const thumbsPerPage = Math.floor(pageWidth / thumbWithSep);
+        //
+        // let spaceWithThumbs = thumbsPerPage * thumbWithSep;
+        // if (spaceWithThumbs + this.state.thumbnailWidth < pageWidth) {
+        //     spaceWithThumbs += this.state.thumbnailWidth
+        // }
+        //
+        // this.state.padding = Math.floor((pageWidth - spaceWithThumbs) / 2);
+    }
+
+    componentDidMount = () => {
+        this.checkWindowSize();
+    }
+
+    checkWindowSize = async (prevClientWidth) => {
+        try {
+            const {videoGridGroup} = this.refs;
+
+            if (videoGridGroup.clientWidth !== prevClientWidth) {
+                const padding = this.getPagePadding(videoGridGroup.clientWidth);
+
+                await this.setState({padding});
+            }
+
+            setTimeout(this.checkWindowSize.bind(null, videoGridGroup.clientWidth), 250);
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    getPagePadding = (clientWidth) => {
+        const pageWidth = clientWidth;
         const thumbWithSep = this.state.thumbnailWidth + 10;
 
         const thumbsPerPage = Math.floor(pageWidth / thumbWithSep);
@@ -26,7 +61,7 @@ class VideoGridGroup extends Component {
             spaceWithThumbs += this.state.thumbnailWidth
         }
 
-        this.state.padding = Math.floor((pageWidth - spaceWithThumbs) / 2);
+        return Math.floor((pageWidth - spaceWithThumbs) / 2);
     }
 
     render() {
@@ -57,7 +92,7 @@ class VideoGridGroup extends Component {
         };
 
         return (
-            <div className = 'VideoGridGroup' style = {videoGridGroupStyle}>
+            <div ref = 'videoGridGroup' className = 'VideoGridGroup' style = {videoGridGroupStyle}>
                 {videoGrid}
             </div>
         );

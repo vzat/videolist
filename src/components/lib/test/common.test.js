@@ -11,7 +11,10 @@ describe ('common', () => {
 
             let timeString = 'PT' + randomHours + 'H' + randomMins + 'M' + randomSecs + 'S';
 
+            let timeString2 = 'PT7M';
+
             expect(common.durationToSec(timeString)).toEqual(correctTime);
+            expect(common.durationToSec(timeString2)).toEqual(420);
         });
         it ('returns -1 if an error occurs', () => {
             expect(common.durationToSec('String')).toEqual(-1);
@@ -22,7 +25,19 @@ describe ('common', () => {
             let time = 21109;
             let timeStr = '5:51:49';
 
+            let time2 = 420;
+            let timeStr2 = '7:00';
+
+            let time3 = 5;
+            let timeStr3 = '0:05';
+
+            let time4 = 60;
+            let timeStr4 = '1:00';
+
             expect(common.durationToString(time)).toEqual(timeStr);
+            expect(common.durationToString(time2)).toEqual(timeStr2);
+            expect(common.durationToString(time3)).toEqual(timeStr3);
+            expect(common.durationToString(time4)).toEqual(timeStr4);
         });
     });
     describe('trimStr(string str, int length)', () => {
