@@ -23,6 +23,9 @@ class SubBox extends Component {
 
                 video.videoId = subVid.resourceId.videoId;
                 video.thumbnail = subVid.thumbnails.medium.url ? subVid.thumbnails.medium.url : subVid.thumbnails.default.url;
+                video.previewThumbnails = [ 'https://img.youtube.com/vi/'+ subVid.resourceId.videoId + '/1.jpg',
+                                            'https://img.youtube.com/vi/'+ subVid.resourceId.videoId + '/2.jpg',
+                                            'https://img.youtube.com/vi/'+ subVid.resourceId.videoId + '/3.jpg'];
                 video.length = common.durationToString(common.durationToSec(subVid.duration));
                 video.title = subVid.title;
                 video.channelTitle = subVid.channelTitle;

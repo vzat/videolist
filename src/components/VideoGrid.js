@@ -9,7 +9,10 @@ class VideoGrid extends Component {
     state = {
         width: 225,
         height: 126,
-        thumbnailDetails: true
+        thumbnailDetails: true,
+        showPreview: false,
+        previewThumbnails: ['https://img.youtube.com/vi/umgJD7PMKbI/1.jpg', 'https://img.youtube.com/vi/umgJD7PMKbI/2.jpg', 'https://img.youtube.com/vi/umgJD7PMKbI/3.jpg'],
+        curPreview: 0
     };
 
     constructor (props) {
@@ -18,50 +21,88 @@ class VideoGrid extends Component {
             this.state.width = this.props.width;
             this.state.height = this.props.height;
         }
+
+        this.changePreviewImage();
     }
 
     hideThumbnailDetails = () => {
-        // this.setState({thumbnailDetails: false});
+        if (this.props.previewThumbnails.length === 0) {
+            const thumbnailDetails = this.refs.thumbnailDetails;
+            thumbnailDetails.classList.remove('showTransition');
+            thumbnailDetails.classList.add('hideTransition');
 
-        const thumbnailDetails = this.refs.thumbnailDetails;
-        thumbnailDetails.classList.remove('showTransition');
-        thumbnailDetails.classList.add('hideTransition');
+            const playButton = this.refs.playButton;
+            playButton.classList.remove('hideTransition');
+            playButton.classList.add('showTransition');
 
-        const playButton = this.refs.playButton;
-        playButton.classList.remove('hideTransition');
-        playButton.classList.add('showTransition');
-
-        const thumbnailCover = this.refs.thumbnailCover;
-        thumbnailCover.classList.remove('hideTransition');
-        thumbnailCover.classList.add('showTransition');
+            const thumbnailCover = this.refs.thumbnailCover;
+            thumbnailCover.classList.remove('hideTransition');
+            thumbnailCover.classList.add('showTransition');
+        }
+        else {
+            this.setState({showPreview: true});
+        }
     }
 
     showThumbnailDetails = () => {
-        // this.setState({thumbnailDetails: true});
+        if (this.props.previewThumbnails.length === 0) {
+            const thumbnailDetails = this.refs.thumbnailDetails;
+            thumbnailDetails.classList.remove('hideTransition');
+            thumbnailDetails.classList.add('showTransition');
 
-        const thumbnailDetails = this.refs.thumbnailDetails;
-        thumbnailDetails.classList.remove('hideTransition');
-        thumbnailDetails.classList.add('showTransition');
+            const playButton = this.refs.playButton;
+            playButton.classList.remove('showTransition');
+            playButton.classList.add('hideTransition');
 
-        const playButton = this.refs.playButton;
-        playButton.classList.remove('showTransition');
-        playButton.classList.add('hideTransition');
+            const thumbnailCover = this.refs.thumbnailCover;
+            thumbnailCover.classList.add('hideTransition');
+            thumbnailCover.classList.remove('showTransition');
+        }
+        else {
+            this.setState({showPreview: false});
+        }
+    }
 
-        const thumbnailCover = this.refs.thumbnailCover;
-        thumbnailCover.classList.add('hideTransition');
-        thumbnailCover.classList.remove('showTransition');
+    changePreviewImage = async () => {
+        try {
+            if (this.state.showPreview) {
+                let thumbnailCover = this.refs.thumbnailCover;
+                thumbnailCover.classList.remove('changePreviewEnd');
+                thumbnailCover.classList.add('changePreviewStart');
+
+                await new Promise(resolve => { setTimeout(resolve, 500) });
+
+                const nextPreview = (this.state.curPreview + 1) % this.props.previewThumbnails.length;
+                await this.setState({curPreview: nextPreview})
+
+                thumbnailCover.classList.add('changePreviewEnd');
+                thumbnailCover.classList.remove('changePreviewStart');
+
+                await new Promise(resolve => { setTimeout(resolve, 500) });
+            }
+            else if (this.state.curPreview !== 0) {
+                await this.setState({curPreview: 0});
+            }
+
+            setTimeout(this.changePreviewImage, 1000);
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
     }
 
     render() {
         const {width, height, thumbnailDetails} = this.state;
         const widthpx = width + 'px';
-        const heightpx = height + 'px'
+        const heightpx = height + 'px';
         let {thumbnail, length, title, channelTitle, views, publishedAt, likes, dislikes, videoLink, channelLink} = this.props;
+        let thumb = this.state.showPreview ? this.props.previewThumbnails[this.state.curPreview] : thumbnail;
 
         // Styles
         const thumbnailStyle = {
-            backgroundImage: 'url(' + thumbnail + ')',
-            backgroundSize: "contain",
+            backgroundImage: 'url(' + thumb + ')',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
             width: widthpx,
             height: heightpx
         };

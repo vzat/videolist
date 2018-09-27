@@ -43,7 +43,7 @@ class VideoGridGroup extends Component {
                 await this.setState({padding});
             }
 
-            setTimeout(this.checkWindowSize.bind(null, videoGridGroup.clientWidth), 250);
+            setTimeout(this.checkWindowSize.bind(null, videoGridGroup.clientWidth), 100);
         }
         catch (err) {
             throw new Error(JSON.stringify(err));
@@ -71,6 +71,7 @@ class VideoGridGroup extends Component {
         const videoGrid = videos.map((video, idx) => (
             <VideoGrid
                 thumbnail = {video.thumbnail}
+                previewThumbnails = {video.previewThumbnails}
                 length = {video.length}
                 title = {video.title}
                 channelTitle = {video.channelTitle}
