@@ -12,7 +12,8 @@ class VideoGrid extends Component {
         thumbnailDetails: true,
         showPreview: false,
         previewThumbnails: ['https://img.youtube.com/vi/umgJD7PMKbI/1.jpg', 'https://img.youtube.com/vi/umgJD7PMKbI/2.jpg', 'https://img.youtube.com/vi/umgJD7PMKbI/3.jpg'],
-        curPreview: 0
+        curPreview: 0,
+        lineHeight: 10
     };
 
     constructor (props) {
@@ -25,12 +26,19 @@ class VideoGrid extends Component {
         this.changePreviewImage();
     }
 
-    hideThumbnailDetails = () => {
-        if (this.props.previewThumbnails.length === 0) {
-            const thumbnailDetails = this.refs.thumbnailDetails;
-            thumbnailDetails.classList.remove('showTransition');
-            thumbnailDetails.classList.add('hideTransition');
+    componentDidMount = () => {
+        const a = this.refs.videoTitle;
+        const compStyle = window.getComputedStyle(a);
+        const lineHeight = parseFloat(compStyle.getPropertyValue('line-height'), 10);
+        this.setState({lineHeight});
+    }
 
+    hideThumbnailDetails = () => {
+        const thumbnailDetails = this.refs.thumbnailDetails;
+        thumbnailDetails.classList.remove('showTransition');
+        thumbnailDetails.classList.add('hideTransition');
+
+        if (this.props.previewThumbnails.length === 0) {
             const playButton = this.refs.playButton;
             playButton.classList.remove('hideTransition');
             playButton.classList.add('showTransition');
@@ -45,11 +53,11 @@ class VideoGrid extends Component {
     }
 
     showThumbnailDetails = () => {
-        if (this.props.previewThumbnails.length === 0) {
-            const thumbnailDetails = this.refs.thumbnailDetails;
-            thumbnailDetails.classList.remove('hideTransition');
-            thumbnailDetails.classList.add('showTransition');
+        const thumbnailDetails = this.refs.thumbnailDetails;
+        thumbnailDetails.classList.remove('hideTransition');
+        thumbnailDetails.classList.add('showTransition');
 
+        if (this.props.previewThumbnails.length === 0) {
             const playButton = this.refs.playButton;
             playButton.classList.remove('showTransition');
             playButton.classList.add('hideTransition');
@@ -84,7 +92,7 @@ class VideoGrid extends Component {
                 await this.setState({curPreview: 0});
             }
 
-            setTimeout(this.changePreviewImage, 1000);
+            setTimeout(this.changePreviewImage, 750);
         }
         catch (err) {
             throw new Error(JSON.stringify(err));
@@ -92,9 +100,11 @@ class VideoGrid extends Component {
     }
 
     render() {
-        const {width, height, thumbnailDetails} = this.state;
+        const {width, height, lineHeight} = this.state;
         const widthpx = width + 'px';
         const heightpx = height + 'px';
+        const titleHeightpx = (lineHeight * 2) + 'px';
+        console.log(titleHeightpx);
         let {thumbnail, length, title, channelTitle, views, publishedAt, likes, dislikes, videoLink, channelLink} = this.props;
         let thumb = this.state.showPreview ? this.props.previewThumbnails[this.state.curPreview] : thumbnail;
 
@@ -109,7 +119,7 @@ class VideoGrid extends Component {
 
         const videoGridStyle = {
             width: widthpx,
-            height: widthpx,
+
             float: 'left',
             marginRight: '10px',
             marginBottom: '10px',
@@ -136,6 +146,11 @@ class VideoGrid extends Component {
             pointerEvents: 'none'
         };
 
+        const videoTitleStyle = {
+            display: 'block',
+            minHeight: titleHeightpx
+        }
+
         // Tooltips
         const likesTooltip = (
             <Tooltip id = 'likes-tooltip'>
@@ -155,12 +170,6 @@ class VideoGrid extends Component {
             </Tooltip>
         );
 
-        const viewsTooltip = (
-            <Tooltip id = 'view-tooltip'>
-                { common.numToStr(views) }
-            </Tooltip>
-        );
-
         const publishedAtTooltip = (
             <Tooltip id = 'published-at-tooltip'>
                 { (new Date(publishedAt)).toString() }
@@ -171,10 +180,10 @@ class VideoGrid extends Component {
             <Grid className = 'VideoGrid' style = {videoGridStyle}>
                 <Row className = 'grid-row'>
                     <OverlayTrigger id = 'likes-tooltip-overlay' placement = 'bottom' overlay = {likesTooltip} >
-                        <ProgressBar className = 'like-dislike' max = {parseInt(likes) + parseInt(dislikes)} now = {likes} />
+                        <ProgressBar className = 'like-dislike' max = {parseInt(likes, 10) + parseInt(dislikes, 10)} now = {likes} />
                     </OverlayTrigger>
                     <div className = 'thumbnail-container' style = {thumbnailStyle} onMouseOver = {() => this.hideThumbnailDetails()} onMouseOut = {() => this.showThumbnailDetails()}>
-                        <a href = {videoLink} target='_blank' style = {videoLinkStyle} />
+                        <a href = {videoLink} target='_blank' style = {videoLinkStyle} > </a>
                         <div ref = 'thumbnailCover' className = 'hideTransition' style = {thumbnailCoverStyle}> </div>
                         <div ref = 'playButton' className = 'play-button-triangle hideTransition'> </div>
                         <div ref = 'thumbnailDetails'>
@@ -186,19 +195,24 @@ class VideoGrid extends Component {
 
                 <Row className = 'grid-row'>
                     <OverlayTrigger id = 'title-tooltip-overlay' placement = 'top' overlay = {titleTooltip} delayShow = {1000}>
-                        <a href = {videoLink} className = 'no-decoration-link-primary' target='_blank'> { common.trimStr(title, 50) } </a>
+                        <a ref = 'videoTitle' href = {videoLink} className = 'no-decoration-link-primary' style = {videoTitleStyle} target='_blank'> { common.trimStr(title, 45) } </a>
                     </OverlayTrigger>
                 </Row>
 
                 <Row className = 'grid-row-sec'>
+
                     <OverlayTrigger id = 'channel-tooltip-overlay' placement = 'right' overlay = {channelTooltip} delayShow = {1000}>
-                        <a href = {channelLink} className = 'no-decoration-link-secondary' target='_blank'> { common.trimStr(channelTitle, 25) } </a>
+                        <a href = {channelLink} className = 'no-decoration-link-secondary' target='_blank'>
+                            <Glyphicon glyph = 'user' /> { common.trimStr(channelTitle, 25) }
+                        </a>
                     </OverlayTrigger>
                 </Row>
 
                 <Row className = 'grid-row-sec'>
                     <OverlayTrigger id = 'published-at-tooltip-overlay' placement = 'right' overlay = {publishedAtTooltip} delayShow = {1000}>
-                        <div className = 'left-col'> { common.timePassed(publishedAt) } </div>
+                        <div className = 'left-col'>
+                            <Glyphicon glyph = 'time' /> { common.timePassed(publishedAt) }
+                        </div>
                     </OverlayTrigger>
                 </Row>
             </Grid>

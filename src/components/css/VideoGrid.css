@@ -13,6 +13,7 @@
 
 .left-col {
     float: left;
+    cursor: default;
 }
 
 .right-col {
