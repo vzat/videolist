@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import './css/App.css';
 
-// import SubBox from './SubBox';
-import VideoGrid from './VideoGrid';
+import SubBox from './SubBox';
 
-import common from './lib/common';
 import gapiB from './lib/gapi-base.js';
 import gapiYT from './lib/gapi-yt.js';
 
@@ -15,13 +13,14 @@ import {YT_DISCOVERY_DOCS} from './lib/macros.js';
 class App extends Component {
     state = {
         subBox: [],
-        page: 'subBox'
+        page: 'none',
+        endOfPage: false
     }
 
     componentDidMount = async () => {
         try {
             const clientComponents = [{name: 'youtube', version: 'v3'}];
-            let {subBox} = this.state;
+            // let {subBox} = this.state;
 
             await gapiB.load(clientComponents);
 
@@ -33,12 +32,33 @@ class App extends Component {
                   sessionStorage.setItem('subs-fetched', true);
             }
 
-            subBox = await gapiYT.populateSubBox(subBox, 50);
+            await this.setState({page: 'subBox'});
 
-            await this.setState({subBox});
+            this.checkEndOfPage();
         }
         catch (err) {
-            console.log(err);
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    checkEndOfPage = async () => {
+        try {
+            // const app = this.refs.app;
+            const app = document.documentElement;
+
+            const scrollTop = app.scrollTop;
+            const maxScrollTop = app.scrollHeight - app.clientHeight
+            // const per = scrollTop / maxScrollTop;
+
+            let endOfPage = maxScrollTop - scrollTop < 50 ? true : false;
+
+            if (this.state.endOfPage !== endOfPage) {
+                await this.setState({endOfPage});
+            }
+
+            setTimeout(this.checkEndOfPage, 1000);
+        }
+        catch (err) {
             throw new Error(JSON.stringify(err));
         }
     }
@@ -62,31 +82,13 @@ class App extends Component {
     }
 
     render() {
-        // const { subs } = this.state;
-        // const subList = subs.map((index, value) => (
-        //     <li> {subs[value].title} </li>
-        // ));
-        //
-        // const { subBox } = this.state;
-        // const videoList = subBox.map((index, value) => (
-        //     <li> {subBox[value].title} </li>
-        // ));
-
         return (
-            <div className = 'App'>
-                <VideoGrid
-                    thumbnail = 'url'
-                    length = '32'
-                    title = 'Title'
-                    channel = 'Channel'
-                    views = '100000'
-                    publishedAt = '01-01-1970'
-                />
+            <div ref = 'app' className = 'App'>
                 {
-                    // this.state.page === 'subBox' &&
-                    // <SubBox
-                    //     subBox = {this.state.subBox}
-                    // />
+                    this.state.page === 'subBox' &&
+                    <SubBox
+                        endOfPage = {this.state.endOfPage}
+                    />
                 }
             </div>
         );
