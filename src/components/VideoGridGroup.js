@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import './css/VideoGridGroup.css';
 
-import { Grid, Row } from 'react-bootstrap';
-
 import VideoGrid from './VideoGrid';
 
 class VideoGridGroup extends Component {
@@ -12,9 +10,8 @@ class VideoGridGroup extends Component {
         padding: 10
     }
 
-    constructor (props) {
-        super (props);
-
+    // constructor (props) {
+        // super (props);
         // Calculate padding - WIP
         // const pageWidth = document.documentElement.clientWidth - 17;
         // const thumbWithSep = this.state.thumbnailWidth + 10;
@@ -27,7 +24,7 @@ class VideoGridGroup extends Component {
         // }
         //
         // this.state.padding = Math.floor((pageWidth - spaceWithThumbs) / 2);
-    }
+    // }
 
     componentDidMount = () => {
         this.checkWindowSize();

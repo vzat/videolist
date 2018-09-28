@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import './css/App.css';
 
 import SubBox from './SubBox';
-import VideoGrid from './VideoGrid';
-import VideoGridGroup from './VideoGridGroup';
 
 import gapiB from './lib/gapi-base.js';
 import gapiYT from './lib/gapi-yt.js';
@@ -50,7 +48,7 @@ class App extends Component {
 
             const scrollTop = app.scrollTop;
             const maxScrollTop = app.scrollHeight - app.clientHeight
-            const per = scrollTop / maxScrollTop;
+            // const per = scrollTop / maxScrollTop;
 
             let endOfPage = maxScrollTop - scrollTop < 50 ? true : false;
 
