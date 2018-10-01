@@ -78,7 +78,7 @@ class VideoGrid extends Component {
                 thumbnailCover.classList.remove('changePreviewEnd');
                 thumbnailCover.classList.add('changePreviewStart');
 
-                await new Promise(resolve => { setTimeout(resolve, 500) });
+                await new Promise(resolve => { setTimeout(resolve, 200) });
 
                 const nextPreview = (this.state.curPreview + 1) % this.props.previewThumbnails.length;
                 await this.setState({curPreview: nextPreview})
@@ -86,13 +86,13 @@ class VideoGrid extends Component {
                 thumbnailCover.classList.add('changePreviewEnd');
                 thumbnailCover.classList.remove('changePreviewStart');
 
-                await new Promise(resolve => { setTimeout(resolve, 500) });
+                await new Promise(resolve => { setTimeout(resolve, 200) });
             }
             else if (this.state.curPreview !== 0) {
                 await this.setState({curPreview: 0});
             }
 
-            setTimeout(this.changePreviewImage, 750);
+            setTimeout(this.changePreviewImage, 600);
         }
         catch (err) {
             throw new Error(JSON.stringify(err));
@@ -148,7 +148,8 @@ class VideoGrid extends Component {
 
         const videoTitleStyle = {
             display: 'block',
-            minHeight: titleHeightpx
+            height: titleHeightpx,
+            overflow: 'hidden'
         }
 
         // Tooltips
@@ -195,7 +196,7 @@ class VideoGrid extends Component {
 
                 <Row className = 'grid-row'>
                     <OverlayTrigger id = 'title-tooltip-overlay' placement = 'top' overlay = {titleTooltip} delayShow = {1000}>
-                        <a ref = 'videoTitle' href = {videoLink} className = 'no-decoration-link-primary' style = {videoTitleStyle} target='_blank'> { common.trimStr(title, 45) } </a>
+                        <a ref = 'videoTitle' href = {videoLink} className = 'no-decoration-link-primary' style = {videoTitleStyle} target='_blank'> { title } </a>
                     </OverlayTrigger>
                 </Row>
 

@@ -91,9 +91,9 @@
 
 /* Change preview transitions */
 .changePreviewStart, .changePreviewEnd {
-    -webkit-transition: visibility 0.5s linear, opacity 0.5s linear;
-    -moz-transition: visibility 0.5s linear, opacity 0.5s linear;
-    -o-transition: visibility 0.5s linear, opacity 0.5s linear;
+    -webkit-transition: visibility 0.2s linear, opacity 0.2s linear;
+    -moz-transition: visibility 0.2s linear, opacity 0.2s linear;
+    -o-transition: visibility 0.2s linear, opacity 0.2s linear;
 }
 
 .changePreviewStart {
