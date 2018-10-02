@@ -1,0 +1,73 @@
+.Sidebar {
+    height: 100%;
+    width: 70px;
+
+    top: 0; left: 0;
+
+    position: fixed;
+
+    z-index: 1;
+
+    background-color: #111;
+
+    overflow: hidden;
+
+    -webkit-transition: width 0.1s linear;
+    -moz-transition: width 0.1s linear;
+    -o-transition: width 0.1s linear;
+}
+
+.Sidebar:hover {
+    width: 300px;
+    overflow-y: auto;
+}
+
+.channel-thumbnail {
+    border-radius: 50%;
+
+    /* padding: 5px 0px 5px 0px; */
+
+    /* display: block;
+    margin-left: auto;
+    margin-right: auto; */
+
+    width: 50px;
+}
+
+.channel-info {
+    padding: 5px 10px 5px 10px;
+}
+
+.channel-details {
+    position: absolute;
+    display: inline;
+
+    -webkit-transition: visibility 0.1s linear;
+    -moz-transition: visibility 0.1s linear;
+    -o-transition: visibility 0.1s linear;
+
+    width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    padding-left: 10px;
+
+    text-decoration: none;
+    color: white;
+}
+
+.channel-details:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.Sidebar .channel-details {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.Sidebar:hover .channel-details {
+    visibility: visible;
+    opacity: 1;
+}

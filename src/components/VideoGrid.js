@@ -11,7 +11,6 @@ class VideoGrid extends Component {
         height: 126,
         thumbnailDetails: true,
         showPreview: false,
-        previewThumbnails: ['https://img.youtube.com/vi/umgJD7PMKbI/1.jpg', 'https://img.youtube.com/vi/umgJD7PMKbI/2.jpg', 'https://img.youtube.com/vi/umgJD7PMKbI/3.jpg'],
         curPreview: 0,
         lineHeight: 10
     };
@@ -104,7 +103,6 @@ class VideoGrid extends Component {
         const widthpx = width + 'px';
         const heightpx = height + 'px';
         const titleHeightpx = (lineHeight * 2) + 'px';
-        console.log(titleHeightpx);
         let {thumbnail, length, title, channelTitle, views, publishedAt, likes, dislikes, videoLink, channelLink} = this.props;
         let thumb = this.state.showPreview ? this.props.previewThumbnails[this.state.curPreview] : thumbnail;
 
@@ -180,7 +178,7 @@ class VideoGrid extends Component {
         return (
             <Grid className = 'VideoGrid' style = {videoGridStyle}>
                 <Row className = 'grid-row'>
-                    <OverlayTrigger id = 'likes-tooltip-overlay' placement = 'bottom' overlay = {likesTooltip} >
+                    <OverlayTrigger id = 'likes-tooltip-overlay' placement = 'top' overlay = {likesTooltip} >
                         <ProgressBar className = 'like-dislike' max = {parseInt(likes, 10) + parseInt(dislikes, 10)} now = {likes} />
                     </OverlayTrigger>
                     <div className = 'thumbnail-container' style = {thumbnailStyle} onMouseOver = {() => this.hideThumbnailDetails()} onMouseOut = {() => this.showThumbnailDetails()}>

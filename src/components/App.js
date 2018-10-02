@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './css/App.css';
 
 import SubBox from './SubBox';
+import Sidebar from './Sidebar';
 
 import gapiB from './lib/gapi-base.js';
 import gapiYT from './lib/gapi-yt.js';
@@ -84,6 +85,7 @@ class App extends Component {
     render() {
         return (
             <div ref = 'app' className = 'App'>
+                <Sidebar />
                 {
                     this.state.page === 'subBox' &&
                     <SubBox
