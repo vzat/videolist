@@ -1,0 +1,38 @@
+.TopBar {
+    width: 100%;
+    height: 34px;
+
+    top: 0;
+
+    position: fixed;
+
+    z-index: 1;
+
+    background-color: #151515;
+
+    /* overflow: hidden; */
+
+    padding-left: 70px;
+}
+
+/* Dropdown button */
+.video-lists, .video-lists:hover, .video-lists:focus, .video-lists:active {
+    background-color: #222 !important;
+    color: white !important;
+}
+
+/* Dropdown menu background */
+.dropdown-menu {
+    background-color: #222;
+}
+
+/* Dropdown menu text colour */
+.dropdown-menu > li > a {
+    color: white;
+}
+
+/* Hover item in Dropdown menu */
+.dropdown-menu:hover > li:hover > a:hover {
+    background-color: #333;
+    color: white;
+}

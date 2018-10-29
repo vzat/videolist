@@ -178,7 +178,7 @@ class VideoGrid extends Component {
         return (
             <Grid className = 'VideoGrid' style = {videoGridStyle}>
                 <Row className = 'grid-row'>
-                    <OverlayTrigger id = 'likes-tooltip-overlay' placement = 'top' overlay = {likesTooltip} >
+                    <OverlayTrigger id = 'likes-tooltip-overlay' placement = 'bottom' overlay = {likesTooltip} >
                         <ProgressBar className = 'like-dislike' max = {parseInt(likes, 10) + parseInt(dislikes, 10)} now = {likes} />
                     </OverlayTrigger>
                     <div className = 'thumbnail-container' style = {thumbnailStyle} onMouseOver = {() => this.hideThumbnailDetails()} onMouseOut = {() => this.showThumbnailDetails()}>
