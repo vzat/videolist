@@ -14,7 +14,7 @@ class Sidebar extends Component {
     getSubs = async () => {
         try {
             if (!sessionStorage.getItem('subs-fetched')) {
-                setTimeout(this.getSubs(), 1000);
+                setTimeout(this.getSubs, 1000);
                 return;
             }
 
