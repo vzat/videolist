@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import './css/TopBar.css';
 
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
 
 class TopBar extends Component {
     state = {
-        videoLists: {}
+        videoLists: {},
+        currentList: 'All'
     }
 
     componentDidMount = () => {
@@ -35,15 +36,22 @@ class TopBar extends Component {
     }
 
     render() {
+        const { videoLists } = this.state;
+
+        const lists = Object.keys(videoLists).map((list, idx) => (
+            <MenuItem className = 'video-list' eventKey = {idx}> {list} </MenuItem>
+        ));
+
         return (
             <div className = 'TopBar' >
                 <div className = 'logo'> Video List </div>
 
                 <div className = 'content'>
-                    <DropdownButton className = 'video-lists' title = 'Main'>
-                        <MenuItem className = 'video-list' eventKey = '1'> First </MenuItem>
-                        <MenuItem className = 'video-list' eventKey = '2'> Second </MenuItem>
-                        <MenuItem className = 'video-list' eventKey = '3'> Third </MenuItem>
+                    <DropdownButton className = 'video-lists' title = {this.state.currentList}>
+                        {lists}
+                        <MenuItem className = 'video-list' eventKey = 'new'>
+                            <Glyphicon glyph='plus'/> New List
+                        </MenuItem>
                     </DropdownButton>
                 </div>
             </div>

@@ -16,6 +16,23 @@
     /* padding-left: 70px; */
 }
 
+.video-lists {
+    width: 200px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.video-list {
+    width: 200px;
+    text-align: center;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* Dropdown button */
 .video-lists, .video-lists:hover, .video-lists:focus, .video-lists:active {
     background-color: #222 !important;
