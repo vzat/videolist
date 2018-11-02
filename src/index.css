@@ -10,3 +10,8 @@ body {
   /* position: relative;
   overflow: auto; */
 }
+
+.modal-content {
+    color: white;
+    background-color: #222;
+}
