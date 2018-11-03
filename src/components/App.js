@@ -16,7 +16,8 @@ class App extends Component {
     state = {
         subBox: [],
         page: 'none',
-        endOfPage: false
+        endOfPage: false,
+        curPageSubs: new Set(['a'])
     }
 
     componentDidMount = async () => {
@@ -83,11 +84,26 @@ class App extends Component {
         }
     }
 
+    setCurPageSubs = async (subs) => {
+        try {
+            await this.setState({curPageSubs: subs});
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
     render() {
         return (
             <div ref = 'app' className = 'App'>
-                <TopBar />
-                <Sidebar />
+                <TopBar
+                    curPageSubs = {this.state.curPageSubs}
+                    setCurPageSubs = {this.setCurPageSubs}
+                />
+                <Sidebar
+                    curPageSubs = {this.state.curPageSubs}
+                    setCurPageSubs = {this.setCurPageSubs}
+                />
                 {
                     this.state.page === 'subBox' &&
                     <SubBox

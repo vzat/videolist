@@ -17,25 +17,64 @@ class TopBar extends Component {
     }
 
     getVideoLists = async () => {
-        if (!sessionStorage.getItem('subs-fetched')) {
-            setTimeout(this.getVideoLists, 1000);
-            return;
-        }
+        try {
+            if (!sessionStorage.getItem('subs-fetched')) {
+                setTimeout(this.getVideoLists, 1000);
+                return;
+            }
 
-        let videoLists = {
-            'All': await JSON.parse(sessionStorage.getItem('subs-fetched'))
-        };
+            // const subs = await JSON.parse(localStorage.getItem('subscriptions'));
+            // let subIds = new Set();
+            // for (const idx in subs) {
+            //     console.log(subs[idx]);
+            //     subIds.add(subs[idx].resourceId.channelId);
+            // }
 
-        if (localStorage.getItem('video-lists')) {
-            let storedVideoLists = await JSON.parse(localStorage.getItem('video-lists'));
+            const subs = await JSON.parse(localStorage.getItem('subscriptions'));
+            let subIds = [];
+            for (const idx in subs) {
+                subIds.push(subs[idx].resourceId.channelId);
+            }
 
-            videoLists = {
-                ...videoLists,
-                ...storedVideoLists
+            let videoLists = {
+                'All': subIds
             };
-        }
 
-        await this.setState({videoLists});
+            // let videoLists = {
+            //     'All': await JSON.parse(sessionStorage.getItem('subs-fetched'))
+            // };
+
+            if (localStorage.getItem('video-lists')) {
+                let storedVideoLists = await JSON.parse(localStorage.getItem('video-lists'));
+
+                videoLists = {
+                    ...storedVideoLists,
+                    ...videoLists
+                };
+            }
+
+            localStorage.setItem('video-lists', JSON.stringify(videoLists));
+
+            await this.setState({videoLists});
+            await this.props.setCurPageSubs(new Set(videoLists['All']));
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    componentWillReceiveProps = async (nextProps) => {
+        try {
+            if (nextProps.curPageSubs.size > 0) {
+                let { videoLists } = this.state;
+                videoLists[this.state.currentList] = [...nextProps.curPageSubs];
+                localStorage.setItem('video-lists', JSON.stringify(videoLists));
+            }
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
     }
 
     showNewListModal = () => {
@@ -54,13 +93,19 @@ class TopBar extends Component {
         this.setState({newVideoListName: ''});
     }
 
-    onListSelect = (eventKey) => {
-        // Add new list
-        if (eventKey === 'addNewList') {
-            this.showNewListModal();
+    onListSelect = async (eventKey) => {
+        try {
+            // Add new list
+            if (eventKey === 'addNewList') {
+                this.showNewListModal();
+            }
+            else if (this.state.videoLists[eventKey]) {
+                await this.setState({currentList: eventKey});
+                await this.props.setCurPageSubs(new Set(this.state.videoLists[eventKey]));
+            }
         }
-        else if (this.state.videoLists[eventKey]) {
-            this.setState({currentList: eventKey});
+        catch (err) {
+            throw new Error(JSON.stringify(err));
         }
     }
 

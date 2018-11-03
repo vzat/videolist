@@ -20,8 +20,6 @@ class Sidebar extends Component {
 
             const subs = await JSON.parse(localStorage.getItem('subscriptions'));
 
-            console.log(subs);
-
             await this.setState({subs});
         }
         catch (err) {
@@ -29,42 +27,33 @@ class Sidebar extends Component {
         }
     }
 
-    // mouseOverSidebar = async () => {
-    //     try {
-    //         if (!this.state.hover) {
-    //             await new Promise(resolve => { setTimeout(resolve, 100) });
-    //             if (!this.state.hover) await this.setState({hover: true});
-    //         }
-    //     }
-    //     catch (err) {
-    //        throw new Error(err);
-    //     }
-    // }
-    //
-    // mouseOutSidebar = async () => {
-    //     try {
-    //         if (this.state.hover) {
-    //             await new Promise(resolve => { setTimeout(resolve, 100) });
-    //             if (this.state.hover) await this.setState({hover: false});
-    //         }
-    //     }
-    //     catch (err) {
-    //        throw new Error(err);
-    //     }
-    // }
-
     render() {
         const { subs } = this.state;
+        const { curPageSubs } = this.props;
 
         // const channelDetailsStyle = {
         //     display: this.state.hover ? 'inline' : 'none'
         // }
 
+        // console.log(curPageSubs);
+
         const channels = subs.map((channel, idx) => (
             <div className = 'channel-info'>
+                {/* Thumbnail */}
                 <a href = {'https://www.youtube.com/channel/' + channel.resourceId.channelId} target = '_blank'>
-                    <img className = 'channel-thumbnail' src = {channel.thumbnails.default.url} alt = 'Thumbnail' />
+                    {
+                        // The video list contains the current channel
+                        curPageSubs.has(channel.resourceId.channelId) &&
+                        <img className = 'channel-thumbnail' src = {channel.thumbnails.default.url} alt = 'Thumbnail' />
+                    }
+                    {
+                        // The video list does not contain the current channel
+                        !curPageSubs.has(channel.resourceId.channelId) &&
+                        <img className = 'channel-thumbnail grayscale' src = {channel.thumbnails.default.url} alt = 'Thumbnail' />
+                    }
                 </a>
+
+                {/* Channel Name */}
                 <a className = 'channel-details' href = {'https://www.youtube.com/channel/' + channel.resourceId.channelId} target = '_blank'>
                     {channel.title}
                 </a>
