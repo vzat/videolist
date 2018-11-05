@@ -58,9 +58,11 @@ class SubBox extends Component {
         }
     }
 
-    componentDidMount = async () => {
+    initSubBox = async () => {
         try {
-            let {subBox} = this.state;
+            let subBox = [];
+
+            await this.setState({videos: []});
 
             subBox = await gapiYT.populateSubBox(subBox, 50);
 
@@ -69,7 +71,15 @@ class SubBox extends Component {
             this.updateVideos(subBox);
         }
         catch (err) {
-            console.log(err);
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    componentDidMount = async () => {
+        try {
+            await this.initSubBox();
+        }
+        catch (err) {
             throw new Error(JSON.stringify(err));
         }
     }
@@ -79,8 +89,14 @@ class SubBox extends Component {
             if (nextProps.endOfPage === true) {
                 await this.updateSubBox();
             }
+
+            if (!common.eqSets(this.props.curPageSubs, nextProps.curPageSubs)) {
+                // Reload subs
+                await this.initSubBox();
+            }
         }
         catch (err) {
+            console.log(err);
             throw new Error(JSON.stringify(err));
         }
     }

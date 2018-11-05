@@ -7,7 +7,8 @@ class VideoGridGroup extends Component {
     state = {
         thumbnailWidth: 225,
         thumbnailHeight: 126,
-        padding: 10
+        padding: 10,
+        videos: []
     }
 
     // constructor (props) {
@@ -28,6 +29,10 @@ class VideoGridGroup extends Component {
 
     componentDidMount = () => {
         this.checkWindowSize();
+    }
+
+    componentWillReceiveProps = async (nextProps) => {
+        this.setState({videos: nextProps.videos});
     }
 
     checkWindowSize = async (prevClientWidth) => {
@@ -62,7 +67,7 @@ class VideoGridGroup extends Component {
     }
 
     render() {
-        const {videos} = this.props;
+        const {videos} = this.state;
         const {padding} = this.state;
 
         const videoGrid = videos.map((video, idx) => (

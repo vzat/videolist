@@ -55,6 +55,8 @@ class TopBar extends Component {
 
             localStorage.setItem('video-lists', JSON.stringify(videoLists));
 
+            // FIX: Old local storage data is deleted
+
             await this.setState({videoLists});
             await this.props.setCurPageSubs(new Set(videoLists['All']));
         }
@@ -66,7 +68,7 @@ class TopBar extends Component {
 
     componentWillReceiveProps = async (nextProps) => {
         try {
-            if (nextProps.curPageSubs.size > 0) {
+            if (nextProps.curPageSubs.size !== this.state.videoLists[this.state.currentList].size) {
                 let { videoLists } = this.state;
                 videoLists[this.state.currentList] = [...nextProps.curPageSubs];
                 localStorage.setItem('video-lists', JSON.stringify(videoLists));
@@ -125,7 +127,6 @@ class TopBar extends Component {
 
             // CloseModal
             this.hideNewListModal();
-
         }
         else {
             // Display error

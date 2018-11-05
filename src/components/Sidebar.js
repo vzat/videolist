@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './css/Sidebar.css';
 
+import { Button, Glyphicon } from 'react-bootstrap';
+
 class Sidebar extends Component {
     state = {
         subs: [],
@@ -23,6 +25,32 @@ class Sidebar extends Component {
             await this.setState({subs});
         }
         catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    addToList = async (event) => {
+        try {
+            const channelId = event.target.id;
+            let { curPageSubs } = this.props;
+            curPageSubs.add(channelId);
+            await this.props.setCurPageSubs(curPageSubs);
+        }
+        catch (err) {
+            console.log(err);
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    removeFromList = async (event) => {
+        try {
+            const channelId = event.target.id;
+            let { curPageSubs } = this.props;
+            curPageSubs.delete(channelId);
+            await this.props.setCurPageSubs(curPageSubs);
+        }
+        catch (err) {
+            console.log(err);
             throw new Error(JSON.stringify(err));
         }
     }
@@ -53,10 +81,32 @@ class Sidebar extends Component {
                     }
                 </a>
 
-                {/* Channel Name */}
-                <a className = 'channel-details' href = {'https://www.youtube.com/channel/' + channel.resourceId.channelId} target = '_blank'>
-                    {channel.title}
-                </a>
+                <div className = 'channel-details'>
+                    {/* Channel Name */}
+                    <a className = 'channel-name' href = {'https://www.youtube.com/channel/' + channel.resourceId.channelId} target = '_blank'>
+                        {channel.title}
+                    </a>
+
+                    {/* Add or remove channel from the current video list */}
+                    <div className = 'list-add-button'>
+                        {
+                            // The video list contains the current channel
+                            curPageSubs.has(channel.resourceId.channelId) &&
+                            <Button bsStyle = 'danger' bsSize = 'xsmall' onClick = {this.removeFromList} id = {channel.resourceId.channelId}>
+                                <Glyphicon glyph='minus'/>
+                                Remove from list
+                            </Button>
+                        }
+                        {
+                            // The video list does not contain the current channel
+                            !curPageSubs.has(channel.resourceId.channelId) &&
+                            <Button bsStyle = 'primary' bsSize = 'xsmall' onClick = {this.addToList} id = {channel.resourceId.channelId}>
+                                <Glyphicon glyph='plus'/>
+                                Add to list
+                            </Button>
+                        }
+                    </div>
+                </div>
             </div>
         ));
 

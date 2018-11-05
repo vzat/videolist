@@ -65,14 +65,14 @@
 
     padding-left: 10px;
 
-    text-decoration: none;
-    color: white;
+    /* text-decoration: none;
+    color: white; */
 }
 
-.channel-details:hover {
+/* .channel-details:hover {
     color: white;
     text-decoration: underline;
-}
+} */
 
 .Sidebar .channel-details {
     visibility: hidden;
@@ -82,4 +82,19 @@
 .Sidebar:hover .channel-details {
     visibility: visible;
     opacity: 1;
+}
+
+
+.channel-name {
+    text-decoration: none;
+    color: white;
+}
+
+.channel-name:hover {
+    color: white;
+    /* text-decoration: underline; */
+}
+
+.list-add-button {
+    margin-top: 5px;
 }

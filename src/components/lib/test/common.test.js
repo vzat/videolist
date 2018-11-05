@@ -109,4 +109,18 @@ describe ('common', () => {
             expect(correctYear).toContain(common.timePassed(dateYearsAgo));
         });
     });
+    describe('eqSets(Set set1, Set set2)', () => {
+        it ('checks if two sets contain the set elements', () => {
+            const s1 = new Set([1, 2, 3]);
+            const s2 = new Set([1, 2, 3]);
+            const s3 = new Set([7, 8, 9]);
+            const s4 = new Set(['1', '2', '3']);
+            const s5 = new Set([1]);
+
+            expect(common.eqSets(s1, s2)).toEqual(true);
+            expect(common.eqSets(s1, s3)).toEqual(false);
+            expect(common.eqSets(s1, s4)).toEqual(false);
+            expect(common.eqSets(s1, s5)).toEqual(false);
+        });
+    });
 });

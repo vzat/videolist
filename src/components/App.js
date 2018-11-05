@@ -108,6 +108,7 @@ class App extends Component {
                     this.state.page === 'subBox' &&
                     <SubBox
                         endOfPage = {this.state.endOfPage}
+                        curPageSubs = {this.state.curPageSubs}
                     />
                 }
             </div>
