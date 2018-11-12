@@ -6,7 +6,8 @@ import { Button, Glyphicon } from 'react-bootstrap';
 class Sidebar extends Component {
     state = {
         subs: [],
-        hover: false
+        hover: false,
+        loadingSubBox: false
     }
 
     componentDidMount = () => {
@@ -37,7 +38,6 @@ class Sidebar extends Component {
             await this.props.setCurPageSubs(curPageSubs);
         }
         catch (err) {
-            console.log(err);
             throw new Error(JSON.stringify(err));
         }
     }
@@ -50,7 +50,17 @@ class Sidebar extends Component {
             await this.props.setCurPageSubs(curPageSubs);
         }
         catch (err) {
-            console.log(err);
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    componentWillReceiveProps = async (nextProps) => {
+        try {
+            if (this.state.loadingSubBox != nextProps.loadingSubBox) {
+                await this.setState({loadingSubBox: nextProps.loadingSubBox});
+            }
+        }
+        catch (err) {
             throw new Error(JSON.stringify(err));
         }
     }
@@ -92,7 +102,7 @@ class Sidebar extends Component {
                         {
                             // The video list contains the current channel
                             curPageSubs.has(channel.resourceId.channelId) &&
-                            <Button bsStyle = 'danger' bsSize = 'xsmall' onClick = {this.removeFromList} id = {channel.resourceId.channelId}>
+                            <Button bsStyle = 'danger' bsSize = 'xsmall' onClick = {this.removeFromList} id = {channel.resourceId.channelId} disabled = {this.state.loadingSubBox}>
                                 <Glyphicon glyph='minus'/>
                                 Remove from list
                             </Button>
@@ -100,7 +110,7 @@ class Sidebar extends Component {
                         {
                             // The video list does not contain the current channel
                             !curPageSubs.has(channel.resourceId.channelId) &&
-                            <Button bsStyle = 'primary' bsSize = 'xsmall' onClick = {this.addToList} id = {channel.resourceId.channelId}>
+                            <Button bsStyle = 'primary' bsSize = 'xsmall' onClick = {this.addToList} id = {channel.resourceId.channelId} disabled = {this.state.loadingSubBox}>
                                 <Glyphicon glyph='plus'/>
                                 Add to list
                             </Button>

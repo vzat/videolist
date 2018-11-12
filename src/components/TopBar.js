@@ -9,7 +9,8 @@ class TopBar extends Component {
         currentList: 'All',
         newListModalOpened: false,
         newVideoListName: '',
-        showVideoListNameAlert: false
+        showVideoListNameAlert: false,
+        loadingSubBox: true
     }
 
     componentDidMount = () => {
@@ -72,6 +73,10 @@ class TopBar extends Component {
                 let { videoLists } = this.state;
                 videoLists[this.state.currentList] = [...nextProps.curPageSubs];
                 localStorage.setItem('video-lists', JSON.stringify(videoLists));
+            }
+
+            if (nextProps.loadingSubBox !== this.state.loadingSubBox) {
+                await this.setState({loadingSubBox: nextProps.loadingSubBox});
             }
         }
         catch (err) {
@@ -146,7 +151,7 @@ class TopBar extends Component {
                 <div className = 'logo'> Video List </div>
 
                 <div className = 'content'>
-                    <DropdownButton className = 'video-lists' title = {this.state.currentList} onSelect = {this.onListSelect} >
+                    <DropdownButton className = 'video-lists' title = {this.state.currentList} onSelect = {this.onListSelect} disabled = {this.state.loadingSubBox}>
                         {lists}
                         <MenuItem divider />
                         <MenuItem className = 'video-list' eventKey = 'addNewList'>

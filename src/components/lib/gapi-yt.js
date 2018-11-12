@@ -6,6 +6,7 @@ let videosLeft = {};
 let stagingArea = [];
 let videosFetched = new Set();
 let fetchPromises = {};
+let stagingAreaIdx = 0;
 
 const gapiYT = {
     fetchSubs: async () => {
@@ -460,46 +461,92 @@ const gapiYT = {
             throw new Error(err);
         }
     },
-    populateSubBox: async (subBox, maxVideos) => {
+    populateSubBox: async (subBox, maxVideos, channelList) => {
         try {
+            // Init staging area if empty
             if (stagingArea.length === 0) {
                 await gapiYT.initStagingArea();
             }
 
-            let idx = subBox.length;
+            // Reset staging area index if empty subox
+            if (subBox.length === 0) {
+                stagingAreaIdx = 0;
+            }
+
             while (subBox.length < maxVideos) {
-                // !!! WARNING
-                if (idx >= stagingArea.length) return subBox;
+                if (stagingAreaIdx >= stagingArea.length) return subBox;
 
-                const video = stagingArea[idx];
+                const video = stagingArea[stagingAreaIdx];
 
+                // Wait for the channel videos to be fetched if needed
                 await fetchPromises[video.channelId];
 
-                subBox.push(video);
-                videosLeft[video.channelId] --;
-
-                // All the videos from the channel have been fetched
-                // Get new ones, insert them into the stagingArea and sort it
-                // TODO: Maybe do this in parallel
-                // if (videosLeft[video.channelId] < 1) {
-                //     await gapiYT.updateStagingArea(video.channelId);
-                // }
-
-                if (videosLeft[video.channelId] < 2) {
-                    fetchPromises[video.channelId] = gapiYT.updateStagingArea(video.channelId);
-                    // console.log(fetchPromises[video.channelId]);
+                // Only add the video to the sublist if it's in the channelList
+                if (channelList === undefined || channelList.has(video.channelId)) {
+                      subBox.push(video);
+                      // if (subBox.length > 0 && subBox[subBox.length - 1].resourceId.videoId === video.resourceId.videoId) {
+                      //     subBox.splice(-1, 1);
+                      // }
                 }
 
-                idx ++;
+                // Decrease the ammount of videos for the channel in the staging area
+                videosLeft[video.channelId] --;
+
+                // If there are less than 2 videos left for a channnel in the staging area
+                // fetch the next 5 videos
+                if (videosLeft[video.channelId] < 2) {
+                    fetchPromises[video.channelId] = gapiYT.updateStagingArea(video.channelId);
+                }
+
+                stagingAreaIdx ++;
             }
 
             return subBox;
         }
         catch (err) {
-            console.log(err);
             throw new Error(err);
         }
-    }
+    },
+    // populateSubBox: async (subBox, maxVideos) => {
+    //     try {
+    //         if (stagingArea.length === 0) {
+    //             await gapiYT.initStagingArea();
+    //         }
+    //
+    //         let idx = subBox.length;
+    //         while (subBox.length < maxVideos) {
+    //             // !!! WARNING
+    //             if (idx >= stagingArea.length) return subBox;
+    //
+    //             const video = stagingArea[idx];
+    //
+    //             await fetchPromises[video.channelId];
+    //
+    //             subBox.push(video);
+    //             videosLeft[video.channelId] --;
+    //
+    //             // All the videos from the channel have been fetched
+    //             // Get new ones, insert them into the stagingArea and sort it
+    //             // TODO: Maybe do this in parallel
+    //             // if (videosLeft[video.channelId] < 1) {
+    //             //     await gapiYT.updateStagingArea(video.channelId);
+    //             // }
+    //
+    //             if (videosLeft[video.channelId] < 2) {
+    //                 fetchPromises[video.channelId] = gapiYT.updateStagingArea(video.channelId);
+    //                 // console.log(fetchPromises[video.channelId]);
+    //             }
+    //
+    //             idx ++;
+    //         }
+    //
+    //         return subBox;
+    //     }
+    //     catch (err) {
+    //         console.log(err);
+    //         throw new Error(err);
+    //     }
+    // }
 };
 
 export default gapiYT;
