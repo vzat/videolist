@@ -18,7 +18,9 @@ class App extends Component {
         page: 'none',
         endOfPage: false,
         curPageSubs: new Set(['a']),
-        loadingSubBox: true
+        loadingSubBox: true,
+        initSubBox: false,
+        updateSubBox: false
     }
 
     componentDidMount = async () => {
@@ -103,6 +105,24 @@ class App extends Component {
         }
     }
 
+    triggerInitSubBox = async (initSubBox) => {
+        try {
+            await this.setState({initSubBox});
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
+    triggerUpdateSubBox = async (updateSubBox) => {
+        try {
+            await this.setState({updateSubBox});
+        }
+        catch (err) {
+            throw new Error(JSON.stringify(err));
+        }
+    }
+
     render() {
         return (
             <div ref = 'app' className = 'App'>
@@ -111,12 +131,16 @@ class App extends Component {
                     setCurPageSubs = {this.setCurPageSubs}
 
                     loadingSubBox = {this.state.loadingSubBox}
+
+                    triggerInitSubBox = {this.triggerInitSubBox}
                 />
                 <Sidebar
                     curPageSubs = {this.state.curPageSubs}
                     setCurPageSubs = {this.setCurPageSubs}
 
                     loadingSubBox = {this.state.loadingSubBox}
+
+                    triggerInitSubBox = {this.triggerInitSubBox}
                 />
                 {
                     this.state.page === 'subBox' &&
@@ -125,6 +149,11 @@ class App extends Component {
                         curPageSubs = {this.state.curPageSubs}
 
                         setLoadingSubBox = {this.setLoadingSubBox}
+
+                        initSubBox = {this.state.initSubBox}
+                        updateSubBox = {this.state.updateSubBox}
+
+                        triggerInitSubBox = {this.triggerInitSubBox}
                     />
                 }
             </div>

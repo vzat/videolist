@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './css/TopBar.css';
 
-import { DropdownButton, MenuItem, Glyphicon, Modal, Button, Alert } from 'react-bootstrap';
+import { SplitButton, MenuItem, Glyphicon, Modal, Button, Alert } from 'react-bootstrap';
 
 class TopBar extends Component {
     state = {
@@ -139,6 +139,10 @@ class TopBar extends Component {
         }
     }
 
+    handleDropdownClick = () => {
+        this.props.triggerInitSubBox(true);
+    }
+
     render() {
         const { videoLists } = this.state;
 
@@ -151,13 +155,13 @@ class TopBar extends Component {
                 <div className = 'logo'> Video List </div>
 
                 <div className = 'content'>
-                    <DropdownButton className = 'video-lists' title = {this.state.currentList} onSelect = {this.onListSelect} disabled = {this.state.loadingSubBox}>
+                    <SplitButton className = 'video-lists' title = {this.state.currentList} onSelect = {this.onListSelect} onClick = {this.handleDropdownClick} disabled = {this.state.loadingSubBox}>
                         {lists}
                         <MenuItem divider />
                         <MenuItem className = 'video-list' eventKey = 'addNewList'>
                             <Glyphicon glyph='plus'/> New List
                         </MenuItem>
-                    </DropdownButton>
+                    </SplitButton>
                 </div>
 
                 <Modal show = {this.state.newListModalOpened} onHide = {this.hideNewListModal}>

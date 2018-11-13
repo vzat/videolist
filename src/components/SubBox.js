@@ -91,9 +91,12 @@ class SubBox extends Component {
 
                 await this.updateVideos(subBox);
 
+                await this.props.triggerInitSubBox(false);
+
                 await this.setState({triggerInit: false});
 
                 await this.props.setLoadingSubBox(false);
+
             }
 
             setTimeout(this.initSubBox, 100);
@@ -129,6 +132,9 @@ class SubBox extends Component {
                 if (!this.state.triggerInit) {
                     await this.setState({triggerInit: true});
                 }
+            }
+            else if (nextProps.initSubBox && !this.state.triggerInit) {
+                await this.setState({triggerInit: true});
             }
             else if (nextProps.endOfPage === true) {
                 // await this.updateSubBox();

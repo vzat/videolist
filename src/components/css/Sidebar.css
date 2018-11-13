@@ -98,3 +98,8 @@
 .list-add-button {
     margin-top: 5px;
 }
+
+.project-info {
+    background-color: #252525;
+    text-align: center;
+}
